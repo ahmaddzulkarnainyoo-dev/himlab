@@ -710,173 +710,344 @@
   <!-- ═══════════════════════════════════════════ -->
   <!-- JAVASCRIPT: Utilities + GitHub API Hook     -->
   <!-- ═══════════════════════════════════════════ -->
-  <script>
-    // ──────────────────────────────────────────
-    // 1. DATE — Update current date display
-    // ──────────────────────────────────────────
-    const hariMap = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-    const bulanMap = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-    const now = new Date();
-    document.getElementById('current-date').textContent =
-      `${hariMap[now.getDay()]}, ${now.getDate()} ${bulanMap[now.getMonth()]} ${now.getFullYear()}`;
+ /**
+ * ═══════════════════════════════════════════════════════
+ *  HIMLAB NEWS — Dynamic Content Engine
+ *  Ganti seluruh blok <script> di index.html dengan ini.
+ *  Kompatibel dengan Pages CMS + GitHub API + Cloudflare Pages
+ * ═══════════════════════════════════════════════════════
+ */
 
-    // ──────────────────────────────────────────
-    // 2. GITHUB API CONFIG
-    //    Ganti nilai ini dengan repo Anda
-    // ──────────────────────────────────────────
-    const GITHUB_CONFIG = {
-      owner: 'YOUR_GITHUB_USERNAME',   // ← ganti
-      repo:  'YOUR_REPO_NAME',          // ← ganti
-      branch: 'main',
-      postsPath: 'content/posts',       // folder markdown
-    };
+// ──────────────────────────────────────────
+// 1. DATE UTILITIES
+// ──────────────────────────────────────────
+const HARI  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
+               'Juli','Agustus','September','Oktober','November','Desember'];
 
-    // ──────────────────────────────────────────
-    // 3. FETCH POSTS FROM GITHUB
-    //    Dipanggil saat DOMContentLoaded
-    // ──────────────────────────────────────────
-    async function fetchPostsFromGitHub() {
-      const { owner, repo, branch, postsPath } = GITHUB_CONFIG;
+function formatDate(isoDate) {
+  if (!isoDate) return '';
+  try {
+    const d = new Date(isoDate);
+    return `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`;
+  } catch { return isoDate; }
+}
 
-      // Jika config belum diisi, skip (gunakan placeholder)
-      if (owner === 'YOUR_GITHUB_USERNAME') {
-        console.info('[Himlab] GitHub config belum diatur. Menggunakan placeholder.');
-        return;
-      }
+function relativeTime(isoDate) {
+  if (!isoDate) return '';
+  const diff = Date.now() - new Date(isoDate).getTime();
+  const h = Math.floor(diff / 3_600_000);
+  if (h < 1)  return 'Baru saja';
+  if (h < 24) return `${h} jam lalu`;
+  const d = Math.floor(h / 24);
+  if (d === 1) return 'Kemarin';
+  return formatDate(isoDate);
+}
 
-      try {
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${postsPath}?ref=${branch}`;
-        const res = await fetch(apiUrl, {
-          headers: { 'Accept': 'application/vnd.github.v3+json' }
-        });
+const now = new Date();
+const dateEl = document.getElementById('current-date');
+if (dateEl) {
+  dateEl.textContent =
+    `${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}`;
+}
 
-        if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
-        const files = await res.json();
+// ──────────────────────────────────────────
+// 2. GITHUB CONFIG
+//    ↓ Ganti ketiga nilai ini ↓
+// ──────────────────────────────────────────
+const GITHUB_CONFIG = {
+  owner:     'YOUR_GITHUB_USERNAME',   // ← username GitHub Anda
+  repo:      'YOUR_REPO_NAME',         // ← nama repository
+  branch:    'main',
+  postsPath: 'content/posts',
+};
 
-        // Filter hanya file .md
-        const mdFiles = files.filter(f => f.name.endsWith('.md'));
+// ──────────────────────────────────────────
+// 3. FRONTMATTER PARSER
+//    Mendukung format Pages CMS (.pages.yml)
+// ──────────────────────────────────────────
+function parseFrontmatter(text, sourceUrl) {
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+  if (!match) return null;
 
-        // Fetch konten tiap file (max 6 untuk homepage)
-        const posts = await Promise.all(
-          mdFiles.slice(0, 6).map(f => fetchSinglePost(f.download_url))
-        );
+  const fm = {};
+  match[1].split(/\r?\n/).forEach(line => {
+    const colonIdx = line.indexOf(':');
+    if (colonIdx === -1) return;
+    const key = line.slice(0, colonIdx).trim();
+    const val = line.slice(colonIdx + 1).trim().replace(/^["']|["']$/g, '');
+    if (key) fm[key] = val;
+  });
 
-        // Render ke DOM
-        renderPosts(posts.filter(Boolean));
+  const slug = fm.slug || sourceUrl.split('/').pop().replace(/\.md$/, '');
 
-      } catch (err) {
-        console.error('[Himlab] Gagal mengambil data dari GitHub:', err);
-      }
-    }
+  return {
+    title:    fm.title    || 'Tanpa Judul',
+    category: (fm.category || 'umum').toLowerCase().trim(),
+    date:     fm.date     || '',
+    excerpt:  fm.excerpt  || '',
+    image:    fm.image    || '',
+    author:   fm.author   || 'Redaksi Himlab',
+    featured: fm.featured === 'true',
+    slug,
+  };
+}
 
-    // ──────────────────────────────────────────
-    // 4. FETCH + PARSE SINGLE MARKDOWN FILE
-    //    Format frontmatter yang didukung:
-    //    ---
-    //    title: Judul Berita
-    //    category: nasional | hukum | ekonomi | labuhanbatu | opini
-    //    date: 2025-04-27
-    //    excerpt: Ringkasan singkat.
-    //    image: https://... (opsional)
-    //    author: Nama Penulis
-    //    ---
-    // ──────────────────────────────────────────
-    async function fetchSinglePost(rawUrl) {
-      try {
-        const res = await fetch(rawUrl);
-        const text = await res.text();
-        return parseFrontmatter(text, rawUrl);
-      } catch {
-        return null;
-      }
-    }
+// ──────────────────────────────────────────
+// 4. FETCH SINGLE POST
+// ──────────────────────────────────────────
+async function fetchSinglePost(downloadUrl) {
+  try {
+    const res = await fetch(downloadUrl);
+    if (!res.ok) return null;
+    const text = await res.text();
+    return parseFrontmatter(text, downloadUrl);
+  } catch {
+    return null;
+  }
+}
 
-    function parseFrontmatter(text, sourceUrl) {
-      const match = text.match(/^---\n([\s\S]*?)\n---/);
-      if (!match) return null;
+// ──────────────────────────────────────────
+// 5. FETCH ALL POSTS FROM GITHUB
+// ──────────────────────────────────────────
+async function fetchPostsFromGitHub() {
+  const { owner, repo, branch, postsPath } = GITHUB_CONFIG;
 
-      const fm = {};
-      match[1].split('\n').forEach(line => {
-        const [key, ...val] = line.split(':');
-        if (key && val.length) fm[key.trim()] = val.join(':').trim();
-      });
+  if (owner === 'YOUR_GITHUB_USERNAME') {
+    console.info('[Himlab] GitHub config belum diatur. Tetap pakai placeholder.');
+    return;
+  }
 
-      // Ambil slug dari URL
-      const slug = sourceUrl.split('/').pop().replace('.md', '');
-
-      return {
-        title:    fm.title    || 'Tanpa Judul',
-        category: fm.category || 'umum',
-        date:     fm.date     || '',
-        excerpt:  fm.excerpt  || '',
-        image:    fm.image    || '',
-        author:   fm.author   || 'Redaksi',
-        slug,
-      };
-    }
-
-    // ──────────────────────────────────────────
-    // 5. RENDER POSTS KE HERO & SECTION GRID
-    //    Logika: post pertama → hero utama
-    //            sisanya → masuk kategori masing-masing
-    // ──────────────────────────────────────────
-    function renderPosts(posts) {
-      if (!posts.length) return;
-
-      // Hero utama = post pertama
-      const hero = posts[0];
-      if (hero) {
-        document.getElementById('hero-title').textContent = hero.title;
-        document.getElementById('hero-category').textContent = hero.category;
-        document.getElementById('hero-excerpt').textContent = hero.excerpt;
-        document.getElementById('hero-author').innerHTML = `Oleh <strong>${hero.author}</strong>`;
-        document.getElementById('hero-date').textContent = formatDate(hero.date);
-        if (hero.image) document.getElementById('hero-img').src = hero.image;
-        document.getElementById('hero-main').dataset.slug = hero.slug;
-      }
-
-      // TODO: Render post 2-6 ke secondary stack & section grids
-      // Panduan:
-      //   - posts.filter(p => p.category === 'nasional') → #nasional-grid
-      //   - posts.filter(p => p.category === 'hukum')    → #hukum-list
-      //   - posts.filter(p => p.category === 'ekonomi')  → #ekonomi-grid
-      //   - posts.filter(p => p.category === 'labuhanbatu') → #labuhanbatu-grid
-      // Gunakan fungsi createArticleCard(post) di bawah sebagai template
-      console.info('[Himlab] Posts berhasil dimuat:', posts.length, 'artikel');
-    }
-
-    // Template card sederhana (untuk dikembangkan)
-    function createArticleCard(post) {
-      const el = document.createElement('article');
-      el.className = 'news-card';
-      el.innerHTML = `
-        <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-          ${post.image ? `<img src="${post.image}" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />` : ''}
-        </div>
-        <span class="cat-tag text-accent mb-2 block">${post.category}</span>
-        <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
-        <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">${post.excerpt}</p>
-        <span class="text-xs text-ink-muted mt-3 block">${formatDate(post.date)}</span>
-      `;
-      el.addEventListener('click', () => window.location.href = `/posts/${post.slug}`);
-      return el;
-    }
-
-    // Helper: format tanggal ISO ke Indonesia
-    function formatDate(isoDate) {
-      if (!isoDate) return '';
-      try {
-        const d = new Date(isoDate);
-        return `${d.getDate()} ${bulanMap[d.getMonth()]} ${d.getFullYear()}`;
-      } catch { return isoDate; }
-    }
-
-    // ──────────────────────────────────────────
-    // 6. INIT
-    // ──────────────────────────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchPostsFromGitHub();
+  try {
+    const apiUrl =
+      `https://api.github.com/repos/${owner}/${repo}/contents/${postsPath}?ref=${branch}`;
+    const res = await fetch(apiUrl, {
+      headers: { Accept: 'application/vnd.github.v3+json' },
     });
+    if (!res.ok) throw new Error(`GitHub API: ${res.status}`);
+
+    const files  = await res.json();
+    const mdFiles = files.filter(f => f.name.endsWith('.md'));
+
+    // Ambil maks 20 post (tidak semua sekaligus agar tidak kena rate limit)
+    const posts = await Promise.all(
+      mdFiles.slice(0, 20).map(f => fetchSinglePost(f.download_url))
+    );
+
+    renderPosts(posts.filter(Boolean));
+
+  } catch (err) {
+    console.error('[Himlab] Gagal load dari GitHub:', err);
+  }
+}
+
+// ──────────────────────────────────────────
+// 6. CARD BUILDERS
+// ──────────────────────────────────────────
+
+/** Card untuk grid Nasional (3-kolom) */
+function createGridCard(post) {
+  const el = document.createElement('article');
+  el.className = 'news-card';
+  el.innerHTML = `
+    <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+      ${post.image
+        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />`
+        : '<div class="w-full h-full bg-ink-soft"></div>'
+      }
+    </div>
+    <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
+    <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
+    <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">${post.excerpt}</p>
+    <span class="text-xs text-ink-muted mt-3 block">${relativeTime(post.date)}</span>
+  `;
+  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
+  return el;
+}
+
+/** Card untuk list Hukum (4-kolom grid + thumbnail) */
+function createHukumCard(post) {
+  const el = document.createElement('article');
+  el.className = 'news-card py-5 grid grid-cols-1 sm:grid-cols-4 gap-4';
+  el.innerHTML = `
+    <div class="sm:col-span-3">
+      <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
+      <h3 class="font-display font-bold text-lg leading-snug mb-2">${post.title}</h3>
+      <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">${post.excerpt}</p>
+      <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
+        <span>Oleh <strong>${post.author}</strong></span>
+        <span>·</span>
+        <span>${relativeTime(post.date)}</span>
+      </div>
+    </div>
+    <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
+      ${post.image
+        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover" loading="lazy" />`
+        : '<div class="w-full h-full bg-ink-soft"></div>'
+      }
+    </div>
+  `;
+  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
+  return el;
+}
+
+/** Card untuk grid Ekonomi (thumbnail kanan, teks kiri) */
+function createEkonomiCard(post) {
+  const el = document.createElement('article');
+  el.className = 'news-card flex gap-4';
+  el.innerHTML = `
+    <div class="flex-1">
+      <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
+      <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
+      <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">${post.excerpt}</p>
+      <span class="text-xs text-ink-muted mt-2 block">${relativeTime(post.date)}</span>
+    </div>
+    <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
+      ${post.image
+        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover" loading="lazy" />`
+        : '<div class="w-full h-full bg-ink-soft"></div>'
+      }
+    </div>
+  `;
+  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
+  return el;
+}
+
+/** Card untuk section Labuhanbatu (dark background) */
+function createLabuhanbatuCard(post) {
+  const el = document.createElement('article');
+  el.className = 'news-card group';
+  el.innerHTML = `
+    <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+      ${post.image
+        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" loading="lazy" />`
+        : '<div class="w-full h-full bg-ink-soft opacity-50"></div>'
+      }
+    </div>
+    <span class="cat-tag text-accent/80 mb-2 block">${capitalise(post.category)}</span>
+    <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">${post.title}</h3>
+    <span class="text-xs text-paper/50 mt-2 block">${relativeTime(post.date)}</span>
+  `;
+  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
+  return el;
+}
+
+/** Card untuk secondary hero stack (kanan hero) */
+function createSecondaryCard(post) {
+  const el = document.createElement('article');
+  el.className = 'news-card py-4 flex gap-4 items-start';
+  el.innerHTML = `
+    <div class="flex-1 min-w-0">
+      <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
+      <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
+      <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">${post.excerpt}</p>
+      <span class="text-xs text-ink-muted mt-2 block">${relativeTime(post.date)}</span>
+    </div>
+    <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
+      ${post.image
+        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover" loading="lazy" />`
+        : '<div class="w-full h-full bg-ink-soft"></div>'
+      }
+    </div>
+  `;
+  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
+  return el;
+}
+
+function capitalise(str) {
+  if (!str) return '';
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// ──────────────────────────────────────────
+// 7. MASTER RENDER FUNCTION
+// ──────────────────────────────────────────
+function renderPosts(posts) {
+  if (!posts.length) return;
+
+  // Urutkan: post bertanda featured duluan, lalu by date DESC
+  posts.sort((a, b) => {
+    if (a.featured && !b.featured) return -1;
+    if (!a.featured && b.featured) return 1;
+    return new Date(b.date) - new Date(a.date);
+  });
+
+  // ── HERO UTAMA ──
+  const hero = posts[0];
+  document.getElementById('hero-title').textContent    = hero.title;
+  document.getElementById('hero-category').textContent = capitalise(hero.category);
+  document.getElementById('hero-excerpt').textContent  = hero.excerpt;
+  document.getElementById('hero-author').innerHTML =
+    `Oleh <strong class="text-white/80">${hero.author}</strong>`;
+  document.getElementById('hero-date').textContent = formatDate(hero.date);
+  if (hero.image) document.getElementById('hero-img').src = hero.image;
+  const heroMain = document.getElementById('hero-main');
+  heroMain.dataset.slug = hero.slug;
+  heroMain.style.cursor = 'pointer';
+  heroMain.addEventListener('click', () =>
+    (window.location.href = `/posts/${hero.slug}`)
+  );
+
+  // ── SECONDARY HERO STACK (posts 1–3, kategori apapun) ──
+  const secondaryPosts = posts.slice(1, 4);
+  if (secondaryPosts.length) {
+    const sec = document.getElementById('hero-secondary');
+    sec.innerHTML = '';
+    secondaryPosts.forEach(p => sec.appendChild(createSecondaryCard(p)));
+  }
+
+  // ── CATEGORY SECTIONS ──
+  const byCategory = {};
+  posts.forEach(p => {
+    if (!byCategory[p.category]) byCategory[p.category] = [];
+    byCategory[p.category].push(p);
+  });
+
+  // Nasional — grid 3 kolom
+  const nasionalGrid = document.getElementById('nasional-grid');
+  if (nasionalGrid && byCategory.nasional) {
+    nasionalGrid.innerHTML = '';
+    byCategory.nasional.slice(0, 3).forEach(p =>
+      nasionalGrid.appendChild(createGridCard(p))
+    );
+  }
+
+  // Hukum — list layout
+  const hukumList = document.getElementById('hukum-list');
+  if (hukumList && byCategory.hukum) {
+    hukumList.innerHTML = '';
+    byCategory.hukum.slice(0, 3).forEach(p => {
+      const card = createHukumCard(p);
+      card.classList.add('article-divider');
+      hukumList.appendChild(card);
+    });
+  }
+
+  // Ekonomi — grid 2 kolom thumbnail kanan
+  const ekonomiGrid = document.getElementById('ekonomi-grid');
+  if (ekonomiGrid && byCategory.ekonomi) {
+    ekonomiGrid.innerHTML = '';
+    byCategory.ekonomi.slice(0, 4).forEach(p =>
+      ekonomiGrid.appendChild(createEkonomiCard(p))
+    );
+  }
+
+  // Labuhanbatu — dark section grid
+  const labGrid = document.getElementById('labuhanbatu-grid');
+  if (labGrid && byCategory.labuhanbatu) {
+    labGrid.innerHTML = '';
+    byCategory.labuhanbatu.slice(0, 3).forEach(p =>
+      labGrid.appendChild(createLabuhanbatuCard(p))
+    );
+  }
+
+  console.info(`[Himlab] ✓ ${posts.length} artikel dimuat.`);
+}
+
+// ──────────────────────────────────────────
+// 8. INIT
+// ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', fetchPostsFromGitHub);
   </script>
 
 </body>
