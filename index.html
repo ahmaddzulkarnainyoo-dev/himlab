@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Himlab News — Media Berita Labuhanbatu Raya</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Playfair Display (editorial) + DM Sans (clean body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+            body: ['"DM Sans"', 'sans-serif'],
+            mono: ['"DM Mono"', 'monospace'],
+          },
+          colors: {
+            ink: {
+              DEFAULT: '#0d0d0d',
+              soft: '#1a1a1a',
+              muted: '#3d3d3d',
+            },
+            paper: {
+              DEFAULT: '#f8f5f0',
+              bright: '#ffffff',
+              warm: '#f1ece4',
+            },
+            accent: {
+              DEFAULT: '#c0392b',
+              dark: '#96281b',
+              soft: '#fef0ee',
+            },
+            rule: '#d4cfc8',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: #f8f5f0;
+      color: #0d0d0d;
+    }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+
+    /* Rule divider */
+    .section-rule {
+      border-top: 3px solid #0d0d0d;
+      border-bottom: 1px solid #d4cfc8;
+      padding: 4px 0;
+    }
+
+    /* Hero image overlay */
+    .hero-overlay {
+      background: linear-gradient(to top, rgba(13,13,13,0.90) 0%, rgba(13,13,13,0.45) 50%, transparent 100%);
+    }
+
+    /* Category tag */
+    .cat-tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* Card hover */
+    .news-card { transition: opacity 0.2s ease; cursor: pointer; }
+    .news-card:hover { opacity: 0.78; }
+
+    /* Ticker animation */
+    @keyframes ticker {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .ticker-inner {
+      display: flex;
+      animation: ticker 28s linear infinite;
+      width: max-content;
+    }
+    .ticker-inner:hover { animation-play-state: paused; }
+
+    /* Sidebar trending number */
+    .trending-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+      color: #d4cfc8;
+    }
+
+    /* Skeleton loader (for when JS fetches data) */
+    .skeleton {
+      background: linear-gradient(90deg, #e8e3db 25%, #d4cfc8 50%, #e8e3db 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 2px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Subtle divider between articles */
+    .article-divider { border-bottom: 1px solid #d4cfc8; }
+
+    /* Read more arrow */
+    .read-more::after {
+      content: ' →';
+      font-style: normal;
+    }
+
+    /* Mobile nav toggle */
+    #mobile-menu { display: none; }
+    #mobile-menu.open { display: block; }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- BREAKING NEWS TICKER                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="bg-accent text-white overflow-hidden" id="breaking-ticker">
+    <div class="flex items-stretch">
+      <span class="cat-tag bg-ink text-paper px-4 py-2 whitespace-nowrap flex items-center shrink-0 z-10">
+        ⚡ BREAKING
+      </span>
+      <div class="overflow-hidden flex-1 py-2">
+        <div class="ticker-inner">
+          <span class="px-8 text-sm font-body font-medium" id="ticker-text-1">Bupati Labuhanbatu Raya Umumkan Program Beasiswa Daerah 2025 &nbsp;&bull;&nbsp; Infrastruktur Jalan Trans-Labuhanbatu Segera Dimulai &nbsp;&bull;&nbsp; Harga Sawit Merangkak Naik, Petani Labuhanbatu Bergairah &nbsp;&bull;&nbsp; DPRD Sidang Paripurna Bahas APBD Perubahan &nbsp;&bull;</span>
+          <span class="px-8 text-sm font-body font-medium" aria-hidden="true">Bupati Labuhanbatu Raya Umumkan Program Beasiswa Daerah 2025 &nbsp;&bull;&nbsp; Infrastruktur Jalan Trans-Labuhanbatu Segera Dimulai &nbsp;&bull;&nbsp; Harga Sawit Merangkak Naik, Petani Labuhanbatu Bergairah &nbsp;&bull;&nbsp; DPRD Sidang Paripurna Bahas APBD Perubahan &nbsp;&bull;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MASTHEAD / HEADER                           -->
+  <!-- ═══════════════════════════════════════════ -->
+  <header class="bg-paper-bright border-b border-rule">
+    <!-- Top utility bar -->
+    <div class="border-b border-rule">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex items-center justify-between py-1.5 text-xs text-ink-muted">
+        <span id="current-date" class="font-mono">Minggu, 27 April 2025</span>
+        <div class="hidden sm:flex items-center gap-4">
+          <a href="#" class="hover:text-accent transition-colors">Tentang Kami</a>
+          <a href="#" class="hover:text-accent transition-colors">Kontak Redaksi</a>
+          <a href="#" class="hover:text-accent transition-colors">Iklan</a>
+          <a href="https://app.pagescms.org" target="_blank" class="bg-ink text-paper px-3 py-1 cat-tag hover:bg-ink-soft transition-colors">Admin Panel</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Logo + Search -->
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between gap-4">
+      <!-- Logo -->
+      <a href="/" class="flex flex-col items-start shrink-0">
+        <span class="font-display font-black text-3xl sm:text-4xl tracking-tight text-ink leading-none">Himlab<span class="text-accent">.</span></span>
+        <span class="cat-tag text-ink-muted tracking-widest mt-0.5">Media Berita Labuhanbatu Raya</span>
+      </a>
+
+      <!-- Center tagline (hidden on mobile) -->
+      <div class="hidden lg:flex flex-col items-center text-center">
+        <p class="font-display italic text-sm text-ink-muted">"Suara yang Jujur, Berita yang Bermakna"</p>
+      </div>
+
+      <!-- Search + Subscribe -->
+      <div class="flex items-center gap-3">
+        <div class="hidden sm:flex items-center border border-rule bg-paper rounded-none px-3 py-2 gap-2">
+          <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" placeholder="Cari berita..." class="bg-transparent text-sm outline-none w-36 placeholder-ink-muted font-body" />
+        </div>
+        <button class="bg-accent text-white px-4 py-2 text-xs cat-tag hover:bg-accent-dark transition-colors hidden sm:block">
+          Berlangganan
+        </button>
+        <!-- Mobile hamburger -->
+        <button class="sm:hidden p-2" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="border-t border-rule hidden sm:block">
+      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex items-center gap-0 overflow-x-auto">
+        <a href="#" class="nav-link px-4 py-3 text-sm font-body font-600 border-b-2 border-accent text-accent whitespace-nowrap">Beranda</a>
+        <a href="#nasional" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Nasional</a>
+        <a href="#hukum" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Hukum</a>
+        <a href="#ekonomi" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Ekonomi</a>
+        <a href="#labuhanbatu" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap font-semibold">📍 Labuhanbatu</a>
+        <a href="#opini" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Opini</a>
+        <a href="#" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Foto</a>
+        <a href="#" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Video</a>
+      </div>
+    </nav>
+
+    <!-- Mobile nav menu -->
+    <div id="mobile-menu" class="border-t border-rule sm:hidden bg-paper">
+      <div class="flex flex-col">
+        <a href="#" class="px-4 py-3 text-sm border-b border-rule text-accent font-semibold">Beranda</a>
+        <a href="#nasional" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm">Nasional</a>
+        <a href="#hukum" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm">Hukum</a>
+        <a href="#ekonomi" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm">Ekonomi</a>
+        <a href="#labuhanbatu" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm font-semibold">📍 Labuhanbatu</a>
+        <a href="#opini" class="px-4 py-3 text-sm hover:bg-paper-warm">Opini</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- MAIN CONTENT                                -->
+  <!-- ═══════════════════════════════════════════ -->
+  <main class="max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- ─── HERO SECTION ─── -->
+    <section class="mb-10" id="hero-section">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Main Hero Article -->
+        <div class="lg:col-span-2 news-card group" id="hero-main" data-slug="">
+          <div class="relative overflow-hidden aspect-[16/9] bg-ink-muted">
+            <!-- Placeholder image — will be replaced by JS -->
+            <img
+              id="hero-img"
+              src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80"
+              alt="Berita Utama"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div class="hero-overlay absolute inset-0"></div>
+            <!-- Content overlay -->
+            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+              <span class="cat-tag bg-accent text-white px-3 py-1 mb-3 inline-block" id="hero-category">Labuhanbatu</span>
+              <h1 id="hero-title" class="font-display font-black text-2xl sm:text-3xl lg:text-4xl leading-tight mb-3 max-w-2xl">
+                Pemkab Labuhanbatu Luncurkan Program Satu Desa Satu Sarjana untuk Dongkrak Kualitas SDM Daerah
+              </h1>
+              <p id="hero-excerpt" class="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl mb-4 hidden sm:block">
+                Program unggulan ini menargetkan minimal satu lulusan perguruan tinggi di setiap desa di wilayah Labuhanbatu Raya, dengan anggaran yang bersumber dari dana otonomi khusus daerah.
+              </p>
+              <div class="flex items-center gap-3 text-xs text-white/60">
+                <span id="hero-author">Oleh <strong class="text-white/80">Redaksi Himlab</strong></span>
+                <span>·</span>
+                <span id="hero-date">27 April 2025</span>
+                <span>·</span>
+                <span>5 menit baca</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Hero Stack -->
+        <div class="flex flex-col gap-0 divide-y divide-rule" id="hero-secondary">
+
+          <!-- Secondary Article 1 -->
+          <article class="news-card py-4 first:pt-0 flex gap-4 items-start">
+            <div class="flex-1 min-w-0">
+              <span class="cat-tag text-accent mb-2 block">Hukum</span>
+              <h3 class="font-display font-bold text-base leading-snug mb-2 group-hover:text-accent">
+                Sidang Kasus Korupsi Dana Desa Memasuki Fase Pembacaan Tuntutan
+              </h3>
+              <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">Jaksa penuntut umum dijadwalkan membacakan tuntutan dalam kasus dugaan korupsi dana desa senilai Rp 2,3 miliar.</p>
+              <span class="text-xs text-ink-muted mt-2 block">2 jam lalu</span>
+            </div>
+            <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&q=70" alt="" class="w-full h-full object-cover" />
+            </div>
+          </article>
+
+          <!-- Secondary Article 2 -->
+          <article class="news-card py-4 flex gap-4 items-start">
+            <div class="flex-1 min-w-0">
+              <span class="cat-tag text-accent mb-2 block">Ekonomi</span>
+              <h3 class="font-display font-bold text-base leading-snug mb-2">
+                Ekspor CPO Sumatera Utara Melonjak 18% pada Kuartal Pertama 2025
+              </h3>
+              <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">Data Badan Pusat Statistik menunjukkan lonjakan ekspor komoditas sawit yang signifikan dari wilayah Sumatera Utara.</p>
+              <span class="text-xs text-ink-muted mt-2 block">4 jam lalu</span>
+            </div>
+            <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=200&q=70" alt="" class="w-full h-full object-cover" />
+            </div>
+          </article>
+
+          <!-- Secondary Article 3 -->
+          <article class="news-card py-4 flex gap-4 items-start">
+            <div class="flex-1 min-w-0">
+              <span class="cat-tag text-accent mb-2 block">Nasional</span>
+              <h3 class="font-display font-bold text-base leading-snug mb-2">
+                DPR Sahkan RUU Perlindungan Data Pribadi dalam Rapat Paripurna
+              </h3>
+              <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">Pengesahan undang-undang ini membawa Indonesia selangkah lebih maju dalam tata kelola keamanan digital nasional.</p>
+              <span class="text-xs text-ink-muted mt-2 block">6 jam lalu</span>
+            </div>
+            <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
+              <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=200&q=70" alt="" class="w-full h-full object-cover" />
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── MAIN + SIDEBAR LAYOUT ─── -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-x-10 gap-y-12">
+
+      <!-- ── LEFT: Main Content Column ── -->
+      <div class="lg:col-span-2 space-y-12">
+
+        <!-- KATEGORI: NASIONAL -->
+        <section id="nasional">
+          <div class="section-rule mb-6 flex items-baseline justify-between">
+            <h2 class="font-display font-black text-xl tracking-tight">Nasional</h2>
+            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Selengkapnya</a>
+          </div>
+
+          <!-- 3-column article grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" id="nasional-grid">
+
+            <article class="news-card">
+              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+                <img src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&q=70" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              <span class="cat-tag text-accent mb-2 block">Pemerintahan</span>
+              <h3 class="font-display font-bold text-base leading-snug mb-2">Presiden Tinjau Proyek Infrastruktur Prioritas di Sumatera</h3>
+              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Kunjungan kerja presiden ke sejumlah proyek strategis nasional di Pulau Sumatera menjadi perhatian publik.</p>
+              <span class="text-xs text-ink-muted mt-3 block">Kemarin, 14:30</span>
+            </article>
+
+            <article class="news-card">
+              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+                <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&q=70" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              <span class="cat-tag text-accent mb-2 block">Pendidikan</span>
+              <h3 class="font-display font-bold text-base leading-snug mb-2">Mendikbud Rilis Kurikulum Merdeka Versi 3.0 untuk SMP dan SMA</h3>
+              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Pembaruan kurikulum nasional ini menekankan pada pembelajaran berbasis proyek dan penguatan karakter.</p>
+              <span class="text-xs text-ink-muted mt-3 block">Kemarin, 10:00</span>
+            </article>
+
+            <article class="news-card">
+              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=70" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              </div>
+              <span class="cat-tag text-accent mb-2 block">Fiskal</span>
+              <h3 class="font-display font-bold text-base leading-snug mb-2">APBN 2025 Surplus Tipis, Sri Mulyani Sebut Masih Terkendali</h3>
+              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Menteri Keuangan memaparkan realisasi anggaran triwulan pertama dalam konferensi pers di Jakarta.</p>
+              <span class="text-xs text-ink-muted mt-3 block">2 hari lalu</span>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- KATEGORI: HUKUM -->
+        <section id="hukum">
+          <div class="section-rule mb-6 flex items-baseline justify-between">
+            <h2 class="font-display font-black text-xl tracking-tight">Hukum</h2>
+            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Selengkapnya</a>
+          </div>
+
+          <!-- List-style layout for Hukum -->
+          <div class="divide-y divide-rule" id="hukum-list">
+
+            <article class="news-card py-5 first:pt-0 grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div class="sm:col-span-3">
+                <span class="cat-tag text-accent mb-2 block">Peradilan</span>
+                <h3 class="font-display font-bold text-lg leading-snug mb-2">Mahkamah Agung Keluarkan Surat Edaran soal Percepatan Sidang Tipikor di Daerah</h3>
+                <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">Surat edaran ini merespons banyaknya penumpukan perkara tindak pidana korupsi di tingkat pengadilan tinggi daerah.</p>
+                <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
+                  <span>Oleh <strong>Ahmad Fauzi</strong></span><span>·</span><span>3 jam lalu</span>
+                </div>
+              </div>
+              <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+            <article class="news-card py-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div class="sm:col-span-3">
+                <span class="cat-tag text-accent mb-2 block">Legislasi</span>
+                <h3 class="font-display font-bold text-lg leading-snug mb-2">Pembahasan RUU Perlindungan Jurnalis Kembali Masuk Prolegnas Prioritas</h3>
+                <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">Koalisi jurnalis dan organisasi pers mendesak agar pembahasan tidak kembali mandeg seperti periode sebelumnya.</p>
+                <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
+                  <span>Oleh <strong>Siti Rahma</strong></span><span>·</span><span>5 jam lalu</span>
+                </div>
+              </div>
+              <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1453873531674-2151bcd01707?w=400&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+            <article class="news-card py-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div class="sm:col-span-3">
+                <span class="cat-tag text-accent mb-2 block">HAM</span>
+                <h3 class="font-display font-bold text-lg leading-snug mb-2">Komnas HAM Rilis Laporan Tahunan: Kebebasan Berekspresi Masih Terancam</h3>
+                <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">Laporan tersebut mencatat peningkatan kasus kriminalisasi aktivis dan jurnalis selama 2024.</p>
+                <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
+                  <span>Oleh <strong>Redaksi</strong></span><span>·</span><span>7 jam lalu</span>
+                </div>
+              </div>
+              <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1591994843349-f415893b3a6b?w=400&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- KATEGORI: EKONOMI -->
+        <section id="ekonomi">
+          <div class="section-rule mb-6 flex items-baseline justify-between">
+            <h2 class="font-display font-black text-xl tracking-tight">Ekonomi</h2>
+            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Selengkapnya</a>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="ekonomi-grid">
+
+            <article class="news-card flex gap-4">
+              <div class="flex-1">
+                <span class="cat-tag text-accent mb-2 block">Komoditas</span>
+                <h3 class="font-display font-bold text-base leading-snug mb-2">Harga TBS Sawit Petani Naik Rp 400/Kg, Tertinggi dalam Setahun</h3>
+                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Kenaikan harga tandan buah segar ini dipicu oleh meningkatnya permintaan pasar ekspor Asia Timur dan Afrika.</p>
+                <span class="text-xs text-ink-muted mt-2 block">Hari ini, 09:00</span>
+              </div>
+              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=200&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+            <article class="news-card flex gap-4">
+              <div class="flex-1">
+                <span class="cat-tag text-accent mb-2 block">UMKM</span>
+                <h3 class="font-display font-bold text-base leading-snug mb-2">Bank Sumut Salurkan KUR Senilai Rp 1,2 Triliun untuk Petani Sumatera Utara</h3>
+                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Program kredit usaha rakyat ini menyasar lebih dari 40.000 petani skala kecil di kawasan perdesaan Sumut.</p>
+                <span class="text-xs text-ink-muted mt-2 block">Hari ini, 11:00</span>
+              </div>
+              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=200&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+            <article class="news-card flex gap-4">
+              <div class="flex-1">
+                <span class="cat-tag text-accent mb-2 block">Investasi</span>
+                <h3 class="font-display font-bold text-base leading-snug mb-2">Kawasan Industri Rantauprapat Tarik Investasi Rp 3 Triliun dari Swasta</h3>
+                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Beberapa perusahaan pengolahan agribisnis berminat menanamkan modal di kawasan industri yang baru ditetapkan ini.</p>
+                <span class="text-xs text-ink-muted mt-2 block">Kemarin, 16:00</span>
+              </div>
+              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=200&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+            <article class="news-card flex gap-4">
+              <div class="flex-1">
+                <span class="cat-tag text-accent mb-2 block">Inflasi</span>
+                <h3 class="font-display font-bold text-base leading-snug mb-2">Inflasi Labuhanbatu Terkendali di Angka 2,4%, Di Bawah Rata-rata Nasional</h3>
+                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">BPS Labuhanbatu melaporkan tingkat inflasi yang stabil, ditopang oleh kelancaran distribusi bahan pokok.</p>
+                <span class="text-xs text-ink-muted mt-2 block">Kemarin, 13:00</span>
+              </div>
+              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
+                <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=200&q=70" alt="" class="w-full h-full object-cover" />
+              </div>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- KOLOM KHUSUS: LABUHANBATU -->
+        <section id="labuhanbatu" class="bg-ink text-paper p-8 -mx-4 sm:mx-0">
+          <div class="flex items-baseline justify-between mb-6">
+            <div>
+              <span class="cat-tag text-accent mb-1 block">Kolom Khusus</span>
+              <h2 class="font-display font-black text-2xl tracking-tight">📍 Labuhanbatu Raya</h2>
+            </div>
+            <a href="#" class="cat-tag text-paper/50 hover:text-paper read-more transition-colors">Selengkapnya</a>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" id="labuhanbatu-grid">
+
+            <article class="news-card group col-span-1 sm:col-span-1">
+              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+                <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=70" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" />
+              </div>
+              <span class="cat-tag text-accent/80 mb-2 block">Pertanian</span>
+              <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">Revitalisasi Irigasi Desa Aek Nabara Dimulai, Petani Sambut Antusias</h3>
+              <span class="text-xs text-paper/50 mt-2 block">3 jam lalu</span>
+            </article>
+
+            <article class="news-card group">
+              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=70" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" />
+              </div>
+              <span class="cat-tag text-accent/80 mb-2 block">Pendidikan</span>
+              <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">SMAN 1 Rantauprapat Raih Juara 1 Olimpiade Sains Provinsi Sumut 2025</h3>
+              <span class="text-xs text-paper/50 mt-2 block">5 jam lalu</span>
+            </article>
+
+            <article class="news-card group">
+              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+                <img src="https://images.unsplash.com/photo-1566438480900-0609be27a4be?w=600&q=70" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" />
+              </div>
+              <span class="cat-tag text-accent/80 mb-2 block">Budaya</span>
+              <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">Festival Budaya Melayu Labuhanbatu 2025 Dihadiri 30.000 Pengunjung</h3>
+              <span class="text-xs text-paper/50 mt-2 block">1 hari lalu</span>
+            </article>
+
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ── RIGHT: Sidebar ── -->
+      <aside class="lg:col-span-1 space-y-10">
+
+        <!-- Trending Topics -->
+        <div>
+          <div class="section-rule mb-5 flex items-baseline justify-between">
+            <h3 class="font-display font-black text-lg">Trending</h3>
+            <span class="cat-tag text-ink-muted">Hari Ini</span>
+          </div>
+          <ol class="space-y-0 divide-y divide-rule" id="trending-list">
+            <li class="news-card py-4 first:pt-0 flex items-start gap-4">
+              <span class="trending-num">01</span>
+              <div>
+                <span class="cat-tag text-accent mb-1 block">Hukum</span>
+                <p class="font-display font-semibold text-sm leading-snug">KPK Panggil Mantan Bupati Labuhanbatu Terkait Kasus Suap Perizinan</p>
+              </div>
+            </li>
+            <li class="news-card py-4 flex items-start gap-4">
+              <span class="trending-num">02</span>
+              <div>
+                <span class="cat-tag text-accent mb-1 block">Ekonomi</span>
+                <p class="font-display font-semibold text-sm leading-snug">Harga Beras Medium di Pasar Rantauprapat Kembali Normal</p>
+              </div>
+            </li>
+            <li class="news-card py-4 flex items-start gap-4">
+              <span class="trending-num">03</span>
+              <div>
+                <span class="cat-tag text-accent mb-1 block">Nasional</span>
+                <p class="font-display font-semibold text-sm leading-snug">Pemerintah Tetapkan Hari Libur Nasional Tambahan Tahun 2025</p>
+              </div>
+            </li>
+            <li class="news-card py-4 flex items-start gap-4">
+              <span class="trending-num">04</span>
+              <div>
+                <span class="cat-tag text-accent mb-1 block">Labuhanbatu</span>
+                <p class="font-display font-semibold text-sm leading-snug">Jembatan Sungai Bilah Diperlebar, Kapasitas Angkut Ditingkatkan</p>
+              </div>
+            </li>
+            <li class="news-card py-4 flex items-start gap-4">
+              <span class="trending-num">05</span>
+              <div>
+                <span class="cat-tag text-accent mb-1 block">Sosial</span>
+                <p class="font-display font-semibold text-sm leading-snug">Ribuan Warga Ikuti Vaksinasi Gratis di Puskesmas Se-Labuhanbatu Utara</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+
+        <!-- Newsletter Box -->
+        <div class="bg-ink text-paper p-6">
+          <h3 class="font-display font-black text-lg mb-1">Langganan Newsletter</h3>
+          <p class="text-paper/60 text-xs leading-relaxed mb-4">Dapatkan ringkasan berita terpenting Labuhanbatu Raya langsung di kotak masuk Anda, setiap pagi.</p>
+          <input type="email" placeholder="email@anda.com" class="w-full bg-white/10 border border-white/20 text-paper placeholder-paper/40 px-3 py-2 text-sm mb-3 outline-none focus:border-accent font-body" />
+          <button class="w-full bg-accent hover:bg-accent-dark text-white py-2 cat-tag transition-colors">Daftar Sekarang</button>
+        </div>
+
+        <!-- Opini / Suara Warga -->
+        <div id="opini">
+          <div class="section-rule mb-5 flex items-baseline justify-between">
+            <h3 class="font-display font-black text-lg">Opini & Suara Warga</h3>
+            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Semua</a>
+          </div>
+
+          <div class="space-y-0 divide-y divide-rule">
+
+            <article class="news-card py-5 first:pt-0">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
+                  <span class="font-display font-bold text-accent text-sm">DR</span>
+                </div>
+                <div>
+                  <p class="font-body font-semibold text-sm">Dr. Reza Maulana, S.H., M.H.</p>
+                  <p class="text-xs text-ink-muted">Dosen Hukum, UINSU Medan</p>
+                </div>
+              </div>
+              <h4 class="font-display font-bold text-base leading-snug mb-2 italic">"Reformasi Birokrasi Daerah: Antara Harapan dan Realita Lapangan"</h4>
+              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Desentralisasi yang telah berjalan dua dekade lebih seharusnya melahirkan birokrasi yang lebih responsif. Namun kenyataannya, masih banyak layanan publik yang jauh dari kata memuaskan...</p>
+              <a href="#" class="text-xs text-accent hover:underline mt-2 block read-more">Baca selengkapnya</a>
+            </article>
+
+            <article class="news-card py-5">
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-full bg-ink/10 flex items-center justify-center shrink-0">
+                  <span class="font-display font-bold text-ink-muted text-sm">SH</span>
+                </div>
+                <div>
+                  <p class="font-body font-semibold text-sm">Sofyan Harahap</p>
+                  <p class="text-xs text-ink-muted">Petani Kelapa Sawit, Bilah Hilir</p>
+                </div>
+              </div>
+              <h4 class="font-display font-bold text-base leading-snug mb-2 italic">"Pupuk Subsidi Selalu Langka, Siapa yang Harus Bertanggung Jawab?"</h4>
+              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Sudah tiga musim tanam terakhir kami kesulitan mendapatkan pupuk bersubsidi. Distributor bilang stok habis, tapi di pasar gelap ada melimpah dengan harga tiga kali lipat...</p>
+              <a href="#" class="text-xs text-accent hover:underline mt-2 block read-more">Baca selengkapnya</a>
+            </article>
+
+          </div>
+        </div>
+
+        <!-- Tags Cloud -->
+        <div>
+          <div class="section-rule mb-4">
+            <h3 class="font-display font-black text-lg">Topik Populer</h3>
+          </div>
+          <div class="flex flex-wrap gap-2" id="tags-cloud">
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Labuhanbatu</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Rantauprapat</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Korupsi</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#SawitSumut</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#KUR</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Infrastruktur</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Pemkab</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#DPRD</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Pilkada2025</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Pertanian</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Hukum</a>
+            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#BinahRaya</a>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+  </main>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- FOOTER                                      -->
+  <!-- ═══════════════════════════════════════════ -->
+  <footer class="bg-ink text-paper mt-16">
+    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-8 mb-10">
+
+        <!-- Brand -->
+        <div class="sm:col-span-1">
+          <span class="font-display font-black text-3xl leading-none">Himlab<span class="text-accent">.</span></span>
+          <p class="text-paper/50 text-xs leading-relaxed mt-3">Media berita independen untuk warga Labuhanbatu Raya. Menyajikan informasi yang akurat, berimbang, dan berpihak pada kepentingan publik.</p>
+          <div class="flex gap-3 mt-4">
+            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">f</a>
+            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">tw</a>
+            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">ig</a>
+            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">yt</a>
+          </div>
+        </div>
+
+        <!-- Rubrik -->
+        <div>
+          <h5 class="cat-tag text-paper/40 mb-4">Rubrik</h5>
+          <ul class="space-y-2 text-sm text-paper/70">
+            <li><a href="#" class="hover:text-accent transition-colors">Nasional</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Hukum</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Ekonomi</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Labuhanbatu</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Opini</a></li>
+          </ul>
+        </div>
+
+        <!-- Tentang -->
+        <div>
+          <h5 class="cat-tag text-paper/40 mb-4">Perusahaan</h5>
+          <ul class="space-y-2 text-sm text-paper/70">
+            <li><a href="#" class="hover:text-accent transition-colors">Tentang Kami</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Redaksi</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Kode Etik</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Karir</a></li>
+            <li><a href="#" class="hover:text-accent transition-colors">Pasang Iklan</a></li>
+          </ul>
+        </div>
+
+        <!-- Kontak -->
+        <div>
+          <h5 class="cat-tag text-paper/40 mb-4">Kontak</h5>
+          <ul class="space-y-2 text-xs text-paper/60 leading-relaxed">
+            <li>📍 Jl. Diponegoro No. 14, Rantauprapat, Labuhanbatu 21411</li>
+            <li>📧 redaksi@himlabnews.id</li>
+            <li>📞 (0624) 21xxx</li>
+            <li class="pt-2"><a href="https://app.pagescms.org" target="_blank" class="cat-tag border border-white/20 px-3 py-1 hover:bg-accent hover:border-accent transition-all inline-block">⚙ Admin Panel</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-paper/30">
+        <span>© 2025 Himlab News. Seluruh hak cipta dilindungi undang-undang.</span>
+        <div class="flex gap-4">
+          <a href="#" class="hover:text-paper/60">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-paper/60">Syarat & Ketentuan</a>
+          <a href="#" class="hover:text-paper/60">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- JAVASCRIPT: Utilities + GitHub API Hook     -->
+  <!-- ═══════════════════════════════════════════ -->
+  <script>
+    // ──────────────────────────────────────────
+    // 1. DATE — Update current date display
+    // ──────────────────────────────────────────
+    const hariMap = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const bulanMap = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const now = new Date();
+    document.getElementById('current-date').textContent =
+      `${hariMap[now.getDay()]}, ${now.getDate()} ${bulanMap[now.getMonth()]} ${now.getFullYear()}`;
+
+    // ──────────────────────────────────────────
+    // 2. GITHUB API CONFIG
+    //    Ganti nilai ini dengan repo Anda
+    // ──────────────────────────────────────────
+    const GITHUB_CONFIG = {
+      owner: 'YOUR_GITHUB_USERNAME',   // ← ganti
+      repo:  'YOUR_REPO_NAME',          // ← ganti
+      branch: 'main',
+      postsPath: 'content/posts',       // folder markdown
+    };
+
+    // ──────────────────────────────────────────
+    // 3. FETCH POSTS FROM GITHUB
+    //    Dipanggil saat DOMContentLoaded
+    // ──────────────────────────────────────────
+    async function fetchPostsFromGitHub() {
+      const { owner, repo, branch, postsPath } = GITHUB_CONFIG;
+
+      // Jika config belum diisi, skip (gunakan placeholder)
+      if (owner === 'YOUR_GITHUB_USERNAME') {
+        console.info('[Himlab] GitHub config belum diatur. Menggunakan placeholder.');
+        return;
+      }
+
+      try {
+        const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${postsPath}?ref=${branch}`;
+        const res = await fetch(apiUrl, {
+          headers: { 'Accept': 'application/vnd.github.v3+json' }
+        });
+
+        if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
+        const files = await res.json();
+
+        // Filter hanya file .md
+        const mdFiles = files.filter(f => f.name.endsWith('.md'));
+
+        // Fetch konten tiap file (max 6 untuk homepage)
+        const posts = await Promise.all(
+          mdFiles.slice(0, 6).map(f => fetchSinglePost(f.download_url))
+        );
+
+        // Render ke DOM
+        renderPosts(posts.filter(Boolean));
+
+      } catch (err) {
+        console.error('[Himlab] Gagal mengambil data dari GitHub:', err);
+      }
+    }
+
+    // ──────────────────────────────────────────
+    // 4. FETCH + PARSE SINGLE MARKDOWN FILE
+    //    Format frontmatter yang didukung:
+    //    ---
+    //    title: Judul Berita
+    //    category: nasional | hukum | ekonomi | labuhanbatu | opini
+    //    date: 2025-04-27
+    //    excerpt: Ringkasan singkat.
+    //    image: https://... (opsional)
+    //    author: Nama Penulis
+    //    ---
+    // ──────────────────────────────────────────
+    async function fetchSinglePost(rawUrl) {
+      try {
+        const res = await fetch(rawUrl);
+        const text = await res.text();
+        return parseFrontmatter(text, rawUrl);
+      } catch {
+        return null;
+      }
+    }
+
+    function parseFrontmatter(text, sourceUrl) {
+      const match = text.match(/^---\n([\s\S]*?)\n---/);
+      if (!match) return null;
+
+      const fm = {};
+      match[1].split('\n').forEach(line => {
+        const [key, ...val] = line.split(':');
+        if (key && val.length) fm[key.trim()] = val.join(':').trim();
+      });
+
+      // Ambil slug dari URL
+      const slug = sourceUrl.split('/').pop().replace('.md', '');
+
+      return {
+        title:    fm.title    || 'Tanpa Judul',
+        category: fm.category || 'umum',
+        date:     fm.date     || '',
+        excerpt:  fm.excerpt  || '',
+        image:    fm.image    || '',
+        author:   fm.author   || 'Redaksi',
+        slug,
+      };
+    }
+
+    // ──────────────────────────────────────────
+    // 5. RENDER POSTS KE HERO & SECTION GRID
+    //    Logika: post pertama → hero utama
+    //            sisanya → masuk kategori masing-masing
+    // ──────────────────────────────────────────
+    function renderPosts(posts) {
+      if (!posts.length) return;
+
+      // Hero utama = post pertama
+      const hero = posts[0];
+      if (hero) {
+        document.getElementById('hero-title').textContent = hero.title;
+        document.getElementById('hero-category').textContent = hero.category;
+        document.getElementById('hero-excerpt').textContent = hero.excerpt;
+        document.getElementById('hero-author').innerHTML = `Oleh <strong>${hero.author}</strong>`;
+        document.getElementById('hero-date').textContent = formatDate(hero.date);
+        if (hero.image) document.getElementById('hero-img').src = hero.image;
+        document.getElementById('hero-main').dataset.slug = hero.slug;
+      }
+
+      // TODO: Render post 2-6 ke secondary stack & section grids
+      // Panduan:
+      //   - posts.filter(p => p.category === 'nasional') → #nasional-grid
+      //   - posts.filter(p => p.category === 'hukum')    → #hukum-list
+      //   - posts.filter(p => p.category === 'ekonomi')  → #ekonomi-grid
+      //   - posts.filter(p => p.category === 'labuhanbatu') → #labuhanbatu-grid
+      // Gunakan fungsi createArticleCard(post) di bawah sebagai template
+      console.info('[Himlab] Posts berhasil dimuat:', posts.length, 'artikel');
+    }
+
+    // Template card sederhana (untuk dikembangkan)
+    function createArticleCard(post) {
+      const el = document.createElement('article');
+      el.className = 'news-card';
+      el.innerHTML = `
+        <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
+          ${post.image ? `<img src="${post.image}" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />` : ''}
+        </div>
+        <span class="cat-tag text-accent mb-2 block">${post.category}</span>
+        <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
+        <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">${post.excerpt}</p>
+        <span class="text-xs text-ink-muted mt-3 block">${formatDate(post.date)}</span>
+      `;
+      el.addEventListener('click', () => window.location.href = `/posts/${post.slug}`);
+      return el;
+    }
+
+    // Helper: format tanggal ISO ke Indonesia
+    function formatDate(isoDate) {
+      if (!isoDate) return '';
+      try {
+        const d = new Date(isoDate);
+        return `${d.getDate()} ${bulanMap[d.getMonth()]} ${d.getFullYear()}`;
+      } catch { return isoDate; }
+    }
+
+    // ──────────────────────────────────────────
+    // 6. INIT
+    // ──────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchPostsFromGitHub();
+    });
+  </script>
+
+</body>
+</html>
