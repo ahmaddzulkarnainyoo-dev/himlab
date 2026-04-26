@@ -1,0 +1,71 @@
+media:
+  input: public/images/uploads
+  output: /images/uploads
+
+content:
+  - name: posts
+    label: Artikel Berita
+    path: content/posts
+    type: collection
+    format: yaml-frontmatter
+    view:
+      fields: [title, category, date, author]
+      sort: date
+      default_order: DESC
+
+    fields:
+      - name: title
+        label: "Judul Berita"
+        type: string
+        required: true
+
+      - name: slug
+        label: "Slug URL (huruf kecil, tanpa spasi, gunakan tanda -)"
+        type: string
+        required: true
+        comment: "Contoh: bupati-labuhanbatu-raya-luncurkan-beasiswa"
+
+      - name: category
+        label: "Kategori"
+        type: select
+        required: true
+        options:
+          values:
+            - { value: nasional,       label: "Nasional" }
+            - { value: hukum,          label: "Hukum" }
+            - { value: politik,        label: "Politik" }
+            - { value: ekonomi,        label: "Ekonomi" }
+            - { value: internasional,  label: "Internasional" }
+            - { value: opini,          label: "Opini" }
+            - { value: labuhanbatu,    label: "📍 Labuhanbatu Raya" }
+
+      - name: date
+        label: "Tanggal Terbit"
+        type: date
+        required: true
+
+      - name: author
+        label: "Penulis"
+        type: string
+        default: "Redaksi Himlab"
+
+      - name: excerpt
+        label: "Ringkasan (tampil di homepage & SEO)"
+        type: text
+        required: true
+        comment: "Maks 200 karakter. Ini yang muncul di kartu berita."
+
+      - name: image
+        label: "Foto Utama"
+        type: image
+        comment: "Upload gambar atau tempel URL eksternal (HTTPS). Rasio ideal: 16:9."
+
+      - name: featured
+        label: "Jadikan Berita Utama (Hero)?"
+        type: boolean
+        default: false
+        comment: "Centang untuk menampilkan di slot hero halaman utama."
+
+      - name: body
+        label: "Isi Berita"
+        type: rich-text
