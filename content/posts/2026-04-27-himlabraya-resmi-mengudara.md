@@ -1,10 +1,11 @@
 ---
-title: HIMLABRAYA RESMI MENGUDARA
-slug: -DAMN
-category: labuhanbatu
+title: "Uji Coba Sistem Himlab News"
 date: 2026-04-27
-author: ALEX BIN SMITH
-excerpt: DI KOSAN BONJOL BERSAMA BANG LEV
-image: /images/uploads/himlab.jpeg
-featured: true
+category: "nasional"
+author: "Admin"
+featured: "true"
+excerpt: "Sistem sinkronisasi berita sedang diuji untuk memastikan data ditarik dengan sempurna."
+image: "https://via.placeholder.com/800x500"
 ---
+
+Berhasil! Kalau tulisan ini muncul, berarti mesin kita sudah sinkron.
