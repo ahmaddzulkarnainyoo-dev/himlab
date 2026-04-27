@@ -1,11 +1,11 @@
 ---
-title: "Uji Coba Sistem Himlab News"
+title: "Himlab Raya News Resmi Mengudara"
 date: 2026-04-27
 category: "nasional"
 author: "Admin"
 featured: "true"
-excerpt: "Sistem sinkronisasi berita sedang diuji untuk memastikan data ditarik dengan sempurna."
-image: "https://via.placeholder.com/800x500"
+excerpt: "Hari ini Himlab Raya News resmi diluncurkan sebagai media informasi independen."
+image: "https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=1000&auto=format&fit=crop"
 ---
 
-Berhasil! Kalau tulisan ini muncul, berarti mesin kita sudah sinkron.
+Isi beritanya di sini dher.
