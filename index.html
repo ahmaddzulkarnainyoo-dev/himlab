@@ -1,742 +1,271 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Himlab News — Media Berita Labuhanbatu Raya</title>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Google Fonts: Playfair Display (editorial) + DM Sans (clean body) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['"Playfair Display"', 'Georgia', 'serif'],
-            body: ['"DM Sans"', 'sans-serif'],
-            mono: ['"DM Mono"', 'monospace'],
-          },
-          colors: {
-            ink: {
-              DEFAULT: '#0d0d0d',
-              soft: '#1a1a1a',
-              muted: '#3d3d3d',
-            },
-            paper: {
-              DEFAULT: '#f8f5f0',
-              bright: '#ffffff',
-              warm: '#f1ece4',
-            },
-            accent: {
-              DEFAULT: '#c0392b',
-              dark: '#96281b',
-              soft: '#fef0ee',
-            },
-            rule: '#d4cfc8',
-          },
-        },
-      },
-    };
-  </script>
-
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background-color: #f8f5f0;
-      color: #0d0d0d;
-    }
-    .font-display { font-family: 'Playfair Display', Georgia, serif; }
-
-    /* Rule divider */
-    .section-rule {
-      border-top: 3px solid #0d0d0d;
-      border-bottom: 1px solid #d4cfc8;
-      padding: 4px 0;
-    }
-
-    /* Hero image overlay */
-    .hero-overlay {
-      background: linear-gradient(to top, rgba(13,13,13,0.90) 0%, rgba(13,13,13,0.45) 50%, transparent 100%);
-    }
-
-    /* Category tag */
-    .cat-tag {
-      font-family: 'DM Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    /* Card hover */
-    .news-card { transition: opacity 0.2s ease; cursor: pointer; }
-    .news-card:hover { opacity: 0.78; }
-
-    /* Ticker animation */
-    @keyframes ticker {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-    .ticker-inner {
-      display: flex;
-      animation: ticker 28s linear infinite;
-      width: max-content;
-    }
-    .ticker-inner:hover { animation-play-state: paused; }
-
-    /* Sidebar trending number */
-    .trending-num {
-      font-family: 'Playfair Display', serif;
-      font-size: 2rem;
-      font-weight: 900;
-      line-height: 1;
-      color: #d4cfc8;
-    }
-
-    /* Skeleton loader (for when JS fetches data) */
-    .skeleton {
-      background: linear-gradient(90deg, #e8e3db 25%, #d4cfc8 50%, #e8e3db 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-      border-radius: 2px;
-    }
-    @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* Subtle divider between articles */
-    .article-divider { border-bottom: 1px solid #d4cfc8; }
-
-    /* Read more arrow */
-    .read-more::after {
-      content: ' →';
-      font-style: normal;
-    }
-
-    /* Mobile nav toggle */
-    #mobile-menu { display: none; }
-    #mobile-menu.open { display: block; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Antitesis — Berita yang Berani Beda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --ink:#0D0D0D; --paper:#F4F1EC; --cream:#EAE5DB; --red:#C0001A; --red-dim:#8C0013; --gray:#6B6560; --rule:#1E1E1E; --serif:'Libre Baskerville', Georgia, serif; --sans:'Syne', system-ui, sans-serif; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--serif); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  .ticker-wrap { background: var(--ink); color: var(--paper); font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; overflow: hidden; display: flex; align-items: center; height: 34px; }
+  .ticker-label { background: var(--red); padding: 0 16px; height: 100%; display: flex; align-items: center; white-space: nowrap; flex-shrink: 0; letter-spacing: .12em; }
+  .ticker-track { display: flex; animation: ticker 28s linear infinite; gap: 0; }
+  .ticker-track span { white-space: nowrap; padding: 0 40px; opacity: .85; }
+  .ticker-track span::before { content: '◆'; margin-right: 14px; opacity: .4; font-size: 7px; vertical-align: middle; }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  nav { border-bottom: 1px solid var(--rule); position: sticky; top: 0; background: var(--paper); z-index: 100; }
+  .nav-inner { max-width: 1280px; margin: 0 auto; padding: 0 32px; display: flex; align-items: stretch; height: 60px; gap: 0; }
+  .nav-logo { font-family: var(--sans); font-weight: 800; font-size: 22px; letter-spacing: -.02em; text-decoration: none; color: var(--ink); display: flex; align-items: center; margin-right: 40px; gap: 2px; }
+  .nav-logo .dot { color: var(--red); }
+  .nav-links { display: flex; align-items: center; gap: 0; flex: 1; }
+  .nav-links a { font-family: var(--sans); font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; text-decoration: none; color: var(--gray); padding: 0 16px; height: 100%; display: flex; align-items: center; border-right: 1px solid transparent; transition: color .18s, background .18s; position: relative; }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a.active { color: var(--ink); font-weight: 700; }
+  .nav-links a.active::after { content: ''; position: absolute; bottom: 0; left: 16px; right: 16px; height: 2px; background: var(--red); }
+  .nav-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+  .nav-search { background: none; border: 1px solid #ccc; border-radius: 3px; padding: 6px 14px; font-family: var(--sans); font-size: 12px; color: var(--ink); outline: none; width: 160px; transition: border-color .2s; }
+  .nav-search:focus { border-color: var(--ink); }
+  .btn-sub { background: var(--ink); color: var(--paper); border: none; padding: 7px 18px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: background .18s; }
+  .btn-sub:hover { background: var(--red); }
+  .masthead { border-bottom: 3px double var(--rule); padding: 28px 32px 20px; max-width: 1280px; margin: 0 auto; text-align: center; }
+  .masthead-name { font-family: var(--sans); font-weight: 800; font-size: clamp(56px, 9vw, 112px); letter-spacing: -.04em; line-height: 1; color: var(--ink); text-transform: uppercase; position: relative; display: inline-block; opacity: 0; animation: mastheadReveal .8s cubic-bezier(.16,1,.3,1) .1s forwards; }
+  @keyframes mastheadReveal { from { opacity: 0; letter-spacing: .1em; } to { opacity: 1; letter-spacing: -.04em; } }
+  .masthead-name .anti { color: var(--ink); }
+  .masthead-name .tesis { color: var(--paper); -webkit-text-stroke: 2px var(--ink); }
+  .masthead-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 10px; border-top: 1px solid #ccc; }
+  .masthead-meta span { font-family: var(--sans); font-size: 11px; color: var(--gray); letter-spacing: .07em; text-transform: uppercase; }
+  .masthead-tagline { font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--gray); }
+  .section-label { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  .section-label::before { content: ''; width: 4px; height: 22px; background: var(--red); flex-shrink: 0; }
+  .section-label span { font-family: var(--sans); font-weight: 700; font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: var(--ink); }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+  .page { max-width: 1280px; margin: 0 auto; padding: 0 32px 64px; }
+  .hero { display: grid; grid-template-columns: 1fr 360px; gap: 0; border-bottom: 1px solid #ccc; padding: 40px 0 40px; }
+  .hero-main { padding-right: 40px; border-right: 1px solid #ccc; display: flex; flex-direction: column; justify-content: space-between; }
+  .hero-kicker { font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+  .hero-kicker::before { content: ''; width: 24px; height: 2px; background: var(--red); }
+  .hero-headline { font-family: var(--serif); font-size: clamp(32px, 4vw, 52px); font-weight: 700; line-height: 1.12; letter-spacing: -.02em; color: var(--ink); margin-bottom: 20px; max-width: 640px; }
+  .hero-deck { font-size: 16px; color: var(--gray); line-height: 1.7; max-width: 560px; margin-bottom: 28px; }
+  .hero-byline { display: flex; align-items: center; gap: 14px; font-family: var(--sans); font-size: 12px; color: var(--gray); }
+  .hero-byline strong { color: var(--ink); font-weight: 700; }
+  .hero-byline .sep { opacity: .35; }
+  .hero-image-area { width: 100%; aspect-ratio: 16/10; background: var(--ink); border-radius: 2px; overflow: hidden; position: relative; margin-bottom: 20px; }
+  .hero-image-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 40%, #111 100%); display: flex; align-items: flex-end; padding: 20px; }
+  .hero-sidebar { padding-left: 32px; display: flex; flex-direction: column; gap: 0; }
+  .hero-sidebar-label { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
+  .side-story { padding: 16px 0; border-bottom: 1px solid #ddd; cursor: pointer; transition: opacity .15s; }
+  .side-story:last-child { border-bottom: none; }
+  .side-story:hover { opacity: .75; }
+  .side-story .ss-cat { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gray); margin-bottom: 6px; }
+  .side-story .ss-title { font-family: var(--serif); font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); margin-bottom: 6px; }
+  .side-story .ss-time { font-family: var(--sans); font-size: 11px; color: var(--gray); }
+  .grid-section { padding: 40px 0; border-bottom: 1px solid #ccc; }
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px 28px; }
+  .card { display: flex; flex-direction: column; gap: 0; cursor: pointer; transition: transform .2s; }
+  .card:hover { transform: translateY(-2px); }
+  .card:hover .card-title { text-decoration: underline; text-decoration-color: var(--red); text-underline-offset: 3px; }
+  .card-img { width: 100%; aspect-ratio: 3/2; background: var(--cream); border-radius: 2px; overflow: hidden; margin-bottom: 14px; position: relative; }
+  .card-img-inner { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .img-block-1 { background: linear-gradient(160deg, #1c1c1c 0%, #3a3a3a 100%); } .img-block-2 { background: linear-gradient(160deg, #2a1a1a 0%, #4a2828 100%); } .img-block-3 { background: linear-gradient(160deg, #1a1a2a 0%, #2a2a4a 100%); } .img-block-4 { background: linear-gradient(160deg, #1a2a1a 0%, #2a402a 100%); } .img-block-5 { background: linear-gradient(160deg, #2a2010 0%, #4a3820 100%); } .img-block-6 { background: linear-gradient(160deg, #201020 0%, #402040 100%); } .img-block-7 { background: linear-gradient(160deg, #101820 0%, #203040 100%); } .img-block-8 { background: linear-gradient(160deg, #201818 0%, #3c2828 100%); }
+  .card-cat { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--red); margin-bottom: 8px; }
+  .card-title { font-family: var(--serif); font-size: 18px; font-weight: 700; line-height: 1.3; color: var(--ink); margin-bottom: 8px; transition: color .15s; }
+  .card-deck { font-size: 13.5px; color: var(--gray); line-height: 1.6; margin-bottom: 12px; flex: 1; }
+  .card-meta { display: flex; align-items: center; gap: 8px; font-family: var(--sans); font-size: 11px; color: var(--gray); }
+  .card-meta .dot-sep { opacity: .35; }
+  .card-meta .author { font-weight: 600; color: var(--ink); }
+  .card-featured { grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  .card-featured .card-img { margin-bottom: 0; aspect-ratio: 4/3; }
+  .card-featured .card-body { display: flex; flex-direction: column; gap: 0; padding-top: 4px; }
+  .card-featured .card-title { font-size: 24px; line-height: 1.2; margin-bottom: 12px; }
+  .card-featured .card-deck { font-size: 14.5px; }
+  .opini-strip { padding: 40px 0; border-bottom: 1px solid #ccc; }
+  .opini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #ccc; border: 1px solid #ccc; border-radius: 2px; overflow: hidden; margin-top: 0; }
+  .opini-card { background: var(--paper); padding: 24px 20px; cursor: pointer; transition: background .15s; display: flex; flex-direction: column; gap: 10px; }
+  .opini-card:hover { background: var(--cream); }
+  .opini-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--ink); display: flex; align-items: center; justify-content: center; font-family: var(--sans); font-weight: 800; font-size: 14px; color: var(--paper); flex-shrink: 0; }
+  .av1 { background: #1a1a1a; } .av2 { background: var(--red-dim); } .av3 { background: #2a2a3a; } .av4 { background: #1a2a1a; }
+  .opini-author { font-family: var(--sans); font-weight: 700; font-size: 12px; color: var(--ink); letter-spacing: .02em; }
+  .opini-role { font-family: var(--sans); font-size: 11px; color: var(--gray); margin-top: 1px; }
+  .opini-title { font-family: var(--serif); font-size: 15px; font-weight: 700; line-height: 1.35; color: var(--ink); font-style: italic; }
+  .popular-section { padding: 40px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .ranked-list { display: flex; flex-direction: column; gap: 0; }
+  .ranked-item { display: grid; grid-template-columns: 48px 1fr; gap: 0; border-bottom: 1px solid #ddd; padding: 16px 0; cursor: pointer; transition: opacity .15s; }
+  .ranked-item:last-child { border-bottom: none; }
+  .ranked-item:hover { opacity: .7; }
+  .rank-num { font-family: var(--sans); font-weight: 800; font-size: 28px; color: var(--cream); line-height: 1; padding-top: 4px; -webkit-text-stroke: 1px #ccc; }
+  .ranked-item:first-child .rank-num { -webkit-text-stroke: 1.5px var(--red); color: transparent; }
+  .rank-cat { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--red); margin-bottom: 5px; }
+  .rank-title { font-family: var(--serif); font-size: 15px; font-weight: 700; line-height: 1.3; color: var(--ink); }
+  .rank-time { font-family: var(--sans); font-size: 11px; color: var(--gray); margin-top: 6px; }
+  .newsletter-box { background: var(--ink); border-radius: 3px; padding: 36px 32px; display: flex; flex-direction: column; gap: 16px; align-self: start; }
+  .nl-eyebrow { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--red); }
+  .nl-title { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--paper); line-height: 1.25; }
+  .nl-desc { font-size: 13.5px; color: rgba(244,241,236,.6); line-height: 1.6; }
+  .nl-form { display: flex; gap: 8px; margin-top: 4px; }
+  .nl-input { flex: 1; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.15); border-radius: 2px; padding: 10px 14px; font-family: var(--sans); font-size: 13px; color: var(--paper); outline: none; }
+  .nl-btn { background: var(--red); color: #fff; border: none; padding: 10px 18px; font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; border-radius: 2px; white-space: nowrap; transition: background .18s; }
+  .nl-btn:hover { background: #a0001a; }
+  .nl-note { font-family: var(--sans); font-size: 10px; color: rgba(255,255,255,.25); letter-spacing: .04em; }
+  footer { border-top: 3px double var(--rule); margin-top: 0; }
+  .footer-inner { max-width: 1280px; margin: 0 auto; padding: 40px 32px 32px; }
+  .footer-top { display: grid; grid-template-columns: 200px 1fr; gap: 48px; padding-bottom: 32px; border-bottom: 1px solid #ccc; margin-bottom: 24px; }
+  .footer-brand-name { font-family: var(--sans); font-weight: 800; font-size: 28px; letter-spacing: -.03em; color: var(--ink); text-transform: uppercase; line-height: 1; margin-bottom: 8px; }
+  .footer-brand-name .tesis { color: var(--paper); -webkit-text-stroke: 1.5px var(--ink); }
+  .footer-tagline { font-family: var(--serif); font-style: italic; font-size: 12px; color: var(--gray); line-height: 1.5; }
+  .footer-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  .footer-col-title { font-family: var(--sans); font-size: 10px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--ink); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #ddd; }
+  .footer-col a { display: block; font-family: var(--sans); font-size: 12px; color: var(--gray); text-decoration: none; margin-bottom: 7px; transition: color .15s; }
+  .footer-col a:hover { color: var(--ink); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; }
+  .footer-copy { font-family: var(--sans); font-size: 11px; color: var(--gray); letter-spacing: .04em; }
+  .footer-copy a { color: var(--gray); text-decoration: none; }
+  .footer-copy a:hover { color: var(--ink); text-decoration: underline; }
+  .fade-in { opacity: 0; transform: translateY(18px); animation: fadeIn .6s ease forwards; }
+  @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
+</style>
 </head>
-<body class="min-h-screen">
+<body>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- BREAKING NEWS TICKER                        -->
-  <!-- ═══════════════════════════════════════════ -->
-  <div class="bg-accent text-white overflow-hidden" id="breaking-ticker">
-    <div class="flex items-stretch">
-      <span class="cat-tag bg-ink text-paper px-4 py-2 whitespace-nowrap flex items-center shrink-0 z-10">
-        ⚡ BREAKING
-      </span>
-      <div class="overflow-hidden flex-1 py-2">
-        <div class="ticker-inner">
-          <span class="px-8 text-sm font-body font-medium" id="ticker-text-1">Bupati Labuhanbatu Raya Umumkan Program Beasiswa Daerah 2025 &nbsp;&bull;&nbsp; Infrastruktur Jalan Trans-Labuhanbatu Segera Dimulai &nbsp;&bull;&nbsp; Harga Sawit Merangkak Naik, Petani Labuhanbatu Bergairah &nbsp;&bull;&nbsp; DPRD Sidang Paripurna Bahas APBD Perubahan &nbsp;&bull;</span>
-          <span class="px-8 text-sm font-body font-medium" aria-hidden="true">Bupati Labuhanbatu Raya Umumkan Program Beasiswa Daerah 2025 &nbsp;&bull;&nbsp; Infrastruktur Jalan Trans-Labuhanbatu Segera Dimulai &nbsp;&bull;&nbsp; Harga Sawit Merangkak Naik, Petani Labuhanbatu Bergairah &nbsp;&bull;&nbsp; DPRD Sidang Paripurna Bahas APBD Perubahan &nbsp;&bull;</span>
-        </div>
+<div class="ticker-wrap">
+  <div class="ticker-label">Breaking</div>
+  <div style="overflow:hidden;flex:1;display:flex;">
+    <div class="ticker-track">
+      <span>Antitesis.id resmi diluncurkan dengan format berita indepeden dan mendalam</span>
+      <span>Antitesis.id resmi diluncurkan dengan format berita indepeden dan mendalam</span>
+    </div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="nav-logo">ANTI<span class="dot">·</span>TESIS</a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Utama</a>
+      <a href="#">Politik</a>
+      <a href="#">Ekonomi</a>
+      <a href="#">Hukum</a>
+      <a href="#">Sosial</a>
+      <a href="#">Opini</a>
+      <a href="#">Investigasi</a>
+    </div>
+    <div class="nav-right">
+      <input class="nav-search" type="text" placeholder="Cari berita…" />
+      <button class="btn-sub">Langganan</button>
+    </div>
+  </div>
+</nav>
+
+<div class="masthead">
+  <div class="masthead-name">
+    <span class="anti">ANTI</span><span class="tesis">TESIS</span>
+  </div>
+  <div class="masthead-meta">
+    <span>Antitesis.id</span>
+    <span class="masthead-tagline">Berita yang berani beda — independen, dalam, tanpa basa-basi.</span>
+    <span id="current-date">Senin, 27 April 2026</span>
+  </div>
+</div>
+
+<div class="page">
+  <div class="hero">
+    <div class="hero-main" id="hero-main-container">
+       <p style="text-align:center; padding:40px; color:var(--gray);">Memuat berita utama...</p>
+    </div>
+    <div class="hero-sidebar">
+      <div class="hero-sidebar-label">Berita Terkini</div>
+      <div id="hero-sidebar-list">
+        <p style="text-align:center; font-size:12px; color:var(--gray);">Memuat berita...</p>
       </div>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- MASTHEAD / HEADER                           -->
-  <!-- ═══════════════════════════════════════════ -->
-  <header class="bg-paper-bright border-b border-rule">
-    <!-- Top utility bar -->
-    <div class="border-b border-rule">
-      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex items-center justify-between py-1.5 text-xs text-ink-muted">
-        <span id="current-date" class="font-mono">Minggu, 27 April 2025</span>
-        <div class="hidden sm:flex items-center gap-4">
-          <a href="#" class="hover:text-accent transition-colors">Tentang Kami</a>
-          <a href="#" class="hover:text-accent transition-colors">Kontak Redaksi</a>
-          <a href="#" class="hover:text-accent transition-colors">Iklan</a>
-          <a href="https://app.pagescms.org" target="_blank" class="bg-ink text-paper px-3 py-1 cat-tag hover:bg-ink-soft transition-colors">Admin Panel</a>
+  <div class="grid-section">
+    <div class="section-label"><span>Berita Pilihan</span></div>
+    <div class="card-grid" id="berita-pilihan-grid"></div>
+  </div>
+
+  <div class="opini-strip">
+    <div class="section-label"><span>Opini & Analisis</span></div>
+    <div class="opini-grid" id="opini-grid"></div>
+  </div>
+
+  <div class="popular-section">
+    <div>
+      <div class="section-label"><span>Terpopuler Hari Ini</span></div>
+      <div class="ranked-list" id="terpopuler-list"></div>
+    </div>
+    <div>
+      <div class="section-label"><span>Newsletter</span></div>
+      <div class="newsletter-box">
+        <div class="nl-eyebrow">Antitesis Daily</div>
+        <div class="nl-title">Satu email pagi.<br>Lima cerita yang penting.</div>
+        <div class="nl-desc">Tanpa spam, tanpa iklan terselubung. Hanya pilihan editor terbaik, langsung ke kotak masukmu setiap pukul 07.00 WIB.</div>
+        <div class="nl-form">
+          <input class="nl-input" type="email" placeholder="emailmu@domain.com" />
+          <button class="nl-btn">Daftar</button>
+        </div>
+        <div class="nl-note">Gratis selamanya · Bisa berhenti kapan saja</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">ANTI<span class="tesis">TESIS</span></div>
+        <div class="footer-tagline">Independen, dalam,<br>tanpa basa-basi.</div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <div class="footer-col-title">Rubrik</div>
+          <a href="#">Politik</a><a href="#">Ekonomi</a><a href="#">Hukum</a><a href="#">Opini</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Tentang</div>
+          <a href="#">Tentang Kami</a><a href="#">Redaksi</a><a href="#">Kode Etik</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Layanan</div>
+          <a href="#">Langganan</a><a href="#">Newsletter</a><a href="#">RSS Feed</a>
+        </div>
+        <div class="footer-col">
+          <div class="footer-col-title">Ikuti Kami</div>
+          <a href="#">X / Twitter</a><a href="#">Instagram</a><a href="#">YouTube</a>
         </div>
       </div>
     </div>
-
-    <!-- Logo + Search -->
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 py-5 flex items-center justify-between gap-4">
-      <!-- Logo -->
-      <a href="/" class="flex flex-col items-start shrink-0">
-        <span class="font-display font-black text-3xl sm:text-4xl tracking-tight text-ink leading-none">Himlab<span class="text-accent">.</span></span>
-        <span class="cat-tag text-ink-muted tracking-widest mt-0.5">Media Berita Labuhanbatu Raya</span>
-      </a>
-
-      <!-- Center tagline (hidden on mobile) -->
-      <div class="hidden lg:flex flex-col items-center text-center">
-        <p class="font-display italic text-sm text-ink-muted">"Suara yang Jujur, Berita yang Bermakna"</p>
-      </div>
-
-      <!-- Search + Subscribe -->
-      <div class="flex items-center gap-3">
-        <div class="hidden sm:flex items-center border border-rule bg-paper rounded-none px-3 py-2 gap-2">
-          <svg class="w-4 h-4 text-ink-muted" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input type="text" placeholder="Cari berita..." class="bg-transparent text-sm outline-none w-36 placeholder-ink-muted font-body" />
-        </div>
-        <button class="bg-accent text-white px-4 py-2 text-xs cat-tag hover:bg-accent-dark transition-colors hidden sm:block">
-          Berlangganan
-        </button>
-        <!-- Mobile hamburger -->
-        <button class="sm:hidden p-2" onclick="document.getElementById('mobile-menu').classList.toggle('open')">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
-        </button>
-      </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 <a href="#">Antitesis.id</a> · Semua hak dilindungi undang-undang.</div>
+      <div class="footer-copy"><a href="#">Kebijakan Privasi</a> &nbsp;·&nbsp; <a href="#">Syarat & Ketentuan</a></div>
     </div>
+  </div>
+</footer>
 
-    <!-- Main Navigation -->
-    <nav class="border-t border-rule hidden sm:block">
-      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex items-center gap-0 overflow-x-auto">
-        <a href="#" class="nav-link px-4 py-3 text-sm font-body font-600 border-b-2 border-accent text-accent whitespace-nowrap">Beranda</a>
-        <a href="#nasional" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Nasional</a>
-        <a href="#hukum" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Hukum</a>
-        <a href="#ekonomi" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Ekonomi</a>
-        <a href="#labuhanbatu" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap font-semibold">📍 Labuhanbatu</a>
-        <a href="#opini" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Opini</a>
-        <a href="#" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Foto</a>
-        <a href="#" class="nav-link px-4 py-3 text-sm font-body hover:text-accent border-b-2 border-transparent hover:border-accent transition-all whitespace-nowrap">Video</a>
-      </div>
-    </nav>
-
-    <!-- Mobile nav menu -->
-    <div id="mobile-menu" class="border-t border-rule sm:hidden bg-paper">
-      <div class="flex flex-col">
-        <a href="#" class="px-4 py-3 text-sm border-b border-rule text-accent font-semibold">Beranda</a>
-        <a href="#nasional" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm">Nasional</a>
-        <a href="#hukum" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm">Hukum</a>
-        <a href="#ekonomi" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm">Ekonomi</a>
-        <a href="#labuhanbatu" class="px-4 py-3 text-sm border-b border-rule hover:bg-paper-warm font-semibold">📍 Labuhanbatu</a>
-        <a href="#opini" class="px-4 py-3 text-sm hover:bg-paper-warm">Opini</a>
-      </div>
-    </div>
-  </header>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- MAIN CONTENT                                -->
-  <!-- ═══════════════════════════════════════════ -->
-  <main class="max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
-
-    <!-- ─── HERO SECTION ─── -->
-    <section class="mb-10" id="hero-section">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Main Hero Article -->
-        <div class="lg:col-span-2 news-card group" id="hero-main" data-slug="">
-          <div class="relative overflow-hidden aspect-[16/9] bg-ink-muted">
-            <!-- Placeholder image — will be replaced by JS -->
-            <img
-              id="hero-img"
-              src="https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=1200&q=80"
-              alt="Berita Utama"
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div class="hero-overlay absolute inset-0"></div>
-            <!-- Content overlay -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-              <span class="cat-tag bg-accent text-white px-3 py-1 mb-3 inline-block" id="hero-category">Labuhanbatu</span>
-              <h1 id="hero-title" class="font-display font-black text-2xl sm:text-3xl lg:text-4xl leading-tight mb-3 max-w-2xl">
-                Pemkab Labuhanbatu Luncurkan Program Satu Desa Satu Sarjana untuk Dongkrak Kualitas SDM Daerah
-              </h1>
-              <p id="hero-excerpt" class="text-sm sm:text-base text-white/80 leading-relaxed max-w-xl mb-4 hidden sm:block">
-                Program unggulan ini menargetkan minimal satu lulusan perguruan tinggi di setiap desa di wilayah Labuhanbatu Raya, dengan anggaran yang bersumber dari dana otonomi khusus daerah.
-              </p>
-              <div class="flex items-center gap-3 text-xs text-white/60">
-                <span id="hero-author">Oleh <strong class="text-white/80">Redaksi Himlab</strong></span>
-                <span>·</span>
-                <span id="hero-date">27 April 2025</span>
-                <span>·</span>
-                <span>5 menit baca</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Secondary Hero Stack -->
-        <div class="flex flex-col gap-0 divide-y divide-rule" id="hero-secondary">
-
-          <!-- Secondary Article 1 -->
-          <article class="news-card py-4 first:pt-0 flex gap-4 items-start">
-            <div class="flex-1 min-w-0">
-              <span class="cat-tag text-accent mb-2 block">Hukum</span>
-              <h3 class="font-display font-bold text-base leading-snug mb-2 group-hover:text-accent">
-                Sidang Kasus Korupsi Dana Desa Memasuki Fase Pembacaan Tuntutan
-              </h3>
-              <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">Jaksa penuntut umum dijadwalkan membacakan tuntutan dalam kasus dugaan korupsi dana desa senilai Rp 2,3 miliar.</p>
-              <span class="text-xs text-ink-muted mt-2 block">2 jam lalu</span>
-            </div>
-            <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&q=70" alt="" class="w-full h-full object-cover" />
-            </div>
-          </article>
-
-          <!-- Secondary Article 2 -->
-          <article class="news-card py-4 flex gap-4 items-start">
-            <div class="flex-1 min-w-0">
-              <span class="cat-tag text-accent mb-2 block">Ekonomi</span>
-              <h3 class="font-display font-bold text-base leading-snug mb-2">
-                Ekspor CPO Sumatera Utara Melonjak 18% pada Kuartal Pertama 2025
-              </h3>
-              <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">Data Badan Pusat Statistik menunjukkan lonjakan ekspor komoditas sawit yang signifikan dari wilayah Sumatera Utara.</p>
-              <span class="text-xs text-ink-muted mt-2 block">4 jam lalu</span>
-            </div>
-            <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=200&q=70" alt="" class="w-full h-full object-cover" />
-            </div>
-          </article>
-
-          <!-- Secondary Article 3 -->
-          <article class="news-card py-4 flex gap-4 items-start">
-            <div class="flex-1 min-w-0">
-              <span class="cat-tag text-accent mb-2 block">Nasional</span>
-              <h3 class="font-display font-bold text-base leading-snug mb-2">
-                DPR Sahkan RUU Perlindungan Data Pribadi dalam Rapat Paripurna
-              </h3>
-              <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">Pengesahan undang-undang ini membawa Indonesia selangkah lebih maju dalam tata kelola keamanan digital nasional.</p>
-              <span class="text-xs text-ink-muted mt-2 block">6 jam lalu</span>
-            </div>
-            <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=200&q=70" alt="" class="w-full h-full object-cover" />
-            </div>
-          </article>
-
-        </div>
-      </div>
-    </section>
-
-    <!-- ─── MAIN + SIDEBAR LAYOUT ─── -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-x-10 gap-y-12">
-
-      <!-- ── LEFT: Main Content Column ── -->
-      <div class="lg:col-span-2 space-y-12">
-
-        <!-- KATEGORI: NASIONAL -->
-        <section id="nasional">
-          <div class="section-rule mb-6 flex items-baseline justify-between">
-            <h2 class="font-display font-black text-xl tracking-tight">Nasional</h2>
-            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Selengkapnya</a>
-          </div>
-
-          <!-- 3-column article grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" id="nasional-grid">
-
-            <article class="news-card">
-              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-                <img src="https://images.unsplash.com/photo-1541872703-74c5e44368f9?w=600&q=70" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-              </div>
-              <span class="cat-tag text-accent mb-2 block">Pemerintahan</span>
-              <h3 class="font-display font-bold text-base leading-snug mb-2">Presiden Tinjau Proyek Infrastruktur Prioritas di Sumatera</h3>
-              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Kunjungan kerja presiden ke sejumlah proyek strategis nasional di Pulau Sumatera menjadi perhatian publik.</p>
-              <span class="text-xs text-ink-muted mt-3 block">Kemarin, 14:30</span>
-            </article>
-
-            <article class="news-card">
-              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-                <img src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=600&q=70" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-              </div>
-              <span class="cat-tag text-accent mb-2 block">Pendidikan</span>
-              <h3 class="font-display font-bold text-base leading-snug mb-2">Mendikbud Rilis Kurikulum Merdeka Versi 3.0 untuk SMP dan SMA</h3>
-              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Pembaruan kurikulum nasional ini menekankan pada pembelajaran berbasis proyek dan penguatan karakter.</p>
-              <span class="text-xs text-ink-muted mt-3 block">Kemarin, 10:00</span>
-            </article>
-
-            <article class="news-card">
-              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=600&q=70" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
-              </div>
-              <span class="cat-tag text-accent mb-2 block">Fiskal</span>
-              <h3 class="font-display font-bold text-base leading-snug mb-2">APBN 2025 Surplus Tipis, Sri Mulyani Sebut Masih Terkendali</h3>
-              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Menteri Keuangan memaparkan realisasi anggaran triwulan pertama dalam konferensi pers di Jakarta.</p>
-              <span class="text-xs text-ink-muted mt-3 block">2 hari lalu</span>
-            </article>
-
-          </div>
-        </section>
-
-        <!-- KATEGORI: HUKUM -->
-        <section id="hukum">
-          <div class="section-rule mb-6 flex items-baseline justify-between">
-            <h2 class="font-display font-black text-xl tracking-tight">Hukum</h2>
-            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Selengkapnya</a>
-          </div>
-
-          <!-- List-style layout for Hukum -->
-          <div class="divide-y divide-rule" id="hukum-list">
-
-            <article class="news-card py-5 first:pt-0 grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div class="sm:col-span-3">
-                <span class="cat-tag text-accent mb-2 block">Peradilan</span>
-                <h3 class="font-display font-bold text-lg leading-snug mb-2">Mahkamah Agung Keluarkan Surat Edaran soal Percepatan Sidang Tipikor di Daerah</h3>
-                <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">Surat edaran ini merespons banyaknya penumpukan perkara tindak pidana korupsi di tingkat pengadilan tinggi daerah.</p>
-                <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
-                  <span>Oleh <strong>Ahmad Fauzi</strong></span><span>·</span><span>3 jam lalu</span>
-                </div>
-              </div>
-              <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-            <article class="news-card py-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div class="sm:col-span-3">
-                <span class="cat-tag text-accent mb-2 block">Legislasi</span>
-                <h3 class="font-display font-bold text-lg leading-snug mb-2">Pembahasan RUU Perlindungan Jurnalis Kembali Masuk Prolegnas Prioritas</h3>
-                <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">Koalisi jurnalis dan organisasi pers mendesak agar pembahasan tidak kembali mandeg seperti periode sebelumnya.</p>
-                <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
-                  <span>Oleh <strong>Siti Rahma</strong></span><span>·</span><span>5 jam lalu</span>
-                </div>
-              </div>
-              <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1453873531674-2151bcd01707?w=400&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-            <article class="news-card py-5 grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div class="sm:col-span-3">
-                <span class="cat-tag text-accent mb-2 block">HAM</span>
-                <h3 class="font-display font-bold text-lg leading-snug mb-2">Komnas HAM Rilis Laporan Tahunan: Kebebasan Berekspresi Masih Terancam</h3>
-                <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">Laporan tersebut mencatat peningkatan kasus kriminalisasi aktivis dan jurnalis selama 2024.</p>
-                <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
-                  <span>Oleh <strong>Redaksi</strong></span><span>·</span><span>7 jam lalu</span>
-                </div>
-              </div>
-              <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1591994843349-f415893b3a6b?w=400&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-          </div>
-        </section>
-
-        <!-- KATEGORI: EKONOMI -->
-        <section id="ekonomi">
-          <div class="section-rule mb-6 flex items-baseline justify-between">
-            <h2 class="font-display font-black text-xl tracking-tight">Ekonomi</h2>
-            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Selengkapnya</a>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" id="ekonomi-grid">
-
-            <article class="news-card flex gap-4">
-              <div class="flex-1">
-                <span class="cat-tag text-accent mb-2 block">Komoditas</span>
-                <h3 class="font-display font-bold text-base leading-snug mb-2">Harga TBS Sawit Petani Naik Rp 400/Kg, Tertinggi dalam Setahun</h3>
-                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Kenaikan harga tandan buah segar ini dipicu oleh meningkatnya permintaan pasar ekspor Asia Timur dan Afrika.</p>
-                <span class="text-xs text-ink-muted mt-2 block">Hari ini, 09:00</span>
-              </div>
-              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=200&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-            <article class="news-card flex gap-4">
-              <div class="flex-1">
-                <span class="cat-tag text-accent mb-2 block">UMKM</span>
-                <h3 class="font-display font-bold text-base leading-snug mb-2">Bank Sumut Salurkan KUR Senilai Rp 1,2 Triliun untuk Petani Sumatera Utara</h3>
-                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Program kredit usaha rakyat ini menyasar lebih dari 40.000 petani skala kecil di kawasan perdesaan Sumut.</p>
-                <span class="text-xs text-ink-muted mt-2 block">Hari ini, 11:00</span>
-              </div>
-              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=200&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-            <article class="news-card flex gap-4">
-              <div class="flex-1">
-                <span class="cat-tag text-accent mb-2 block">Investasi</span>
-                <h3 class="font-display font-bold text-base leading-snug mb-2">Kawasan Industri Rantauprapat Tarik Investasi Rp 3 Triliun dari Swasta</h3>
-                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Beberapa perusahaan pengolahan agribisnis berminat menanamkan modal di kawasan industri yang baru ditetapkan ini.</p>
-                <span class="text-xs text-ink-muted mt-2 block">Kemarin, 16:00</span>
-              </div>
-              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1486325212027-8081e485255e?w=200&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-            <article class="news-card flex gap-4">
-              <div class="flex-1">
-                <span class="cat-tag text-accent mb-2 block">Inflasi</span>
-                <h3 class="font-display font-bold text-base leading-snug mb-2">Inflasi Labuhanbatu Terkendali di Angka 2,4%, Di Bawah Rata-rata Nasional</h3>
-                <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">BPS Labuhanbatu melaporkan tingkat inflasi yang stabil, ditopang oleh kelancaran distribusi bahan pokok.</p>
-                <span class="text-xs text-ink-muted mt-2 block">Kemarin, 13:00</span>
-              </div>
-              <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1518186285589-2f7649de83e0?w=200&q=70" alt="" class="w-full h-full object-cover" />
-              </div>
-            </article>
-
-          </div>
-        </section>
-
-        <!-- KOLOM KHUSUS: LABUHANBATU -->
-        <section id="labuhanbatu" class="bg-ink text-paper p-8 -mx-4 sm:mx-0">
-          <div class="flex items-baseline justify-between mb-6">
-            <div>
-              <span class="cat-tag text-accent mb-1 block">Kolom Khusus</span>
-              <h2 class="font-display font-black text-2xl tracking-tight">📍 Labuhanbatu Raya</h2>
-            </div>
-            <a href="#" class="cat-tag text-paper/50 hover:text-paper read-more transition-colors">Selengkapnya</a>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6" id="labuhanbatu-grid">
-
-            <article class="news-card group col-span-1 sm:col-span-1">
-              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-                <img src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&q=70" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" />
-              </div>
-              <span class="cat-tag text-accent/80 mb-2 block">Pertanian</span>
-              <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">Revitalisasi Irigasi Desa Aek Nabara Dimulai, Petani Sambut Antusias</h3>
-              <span class="text-xs text-paper/50 mt-2 block">3 jam lalu</span>
-            </article>
-
-            <article class="news-card group">
-              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&q=70" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" />
-              </div>
-              <span class="cat-tag text-accent/80 mb-2 block">Pendidikan</span>
-              <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">SMAN 1 Rantauprapat Raih Juara 1 Olimpiade Sains Provinsi Sumut 2025</h3>
-              <span class="text-xs text-paper/50 mt-2 block">5 jam lalu</span>
-            </article>
-
-            <article class="news-card group">
-              <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-                <img src="https://images.unsplash.com/photo-1566438480900-0609be27a4be?w=600&q=70" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" />
-              </div>
-              <span class="cat-tag text-accent/80 mb-2 block">Budaya</span>
-              <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">Festival Budaya Melayu Labuhanbatu 2025 Dihadiri 30.000 Pengunjung</h3>
-              <span class="text-xs text-paper/50 mt-2 block">1 hari lalu</span>
-            </article>
-
-          </div>
-        </section>
-
-      </div>
-
-      <!-- ── RIGHT: Sidebar ── -->
-      <aside class="lg:col-span-1 space-y-10">
-
-        <!-- Trending Topics -->
-        <div>
-          <div class="section-rule mb-5 flex items-baseline justify-between">
-            <h3 class="font-display font-black text-lg">Trending</h3>
-            <span class="cat-tag text-ink-muted">Hari Ini</span>
-          </div>
-          <ol class="space-y-0 divide-y divide-rule" id="trending-list">
-            <li class="news-card py-4 first:pt-0 flex items-start gap-4">
-              <span class="trending-num">01</span>
-              <div>
-                <span class="cat-tag text-accent mb-1 block">Hukum</span>
-                <p class="font-display font-semibold text-sm leading-snug">KPK Panggil Mantan Bupati Labuhanbatu Terkait Kasus Suap Perizinan</p>
-              </div>
-            </li>
-            <li class="news-card py-4 flex items-start gap-4">
-              <span class="trending-num">02</span>
-              <div>
-                <span class="cat-tag text-accent mb-1 block">Ekonomi</span>
-                <p class="font-display font-semibold text-sm leading-snug">Harga Beras Medium di Pasar Rantauprapat Kembali Normal</p>
-              </div>
-            </li>
-            <li class="news-card py-4 flex items-start gap-4">
-              <span class="trending-num">03</span>
-              <div>
-                <span class="cat-tag text-accent mb-1 block">Nasional</span>
-                <p class="font-display font-semibold text-sm leading-snug">Pemerintah Tetapkan Hari Libur Nasional Tambahan Tahun 2025</p>
-              </div>
-            </li>
-            <li class="news-card py-4 flex items-start gap-4">
-              <span class="trending-num">04</span>
-              <div>
-                <span class="cat-tag text-accent mb-1 block">Labuhanbatu</span>
-                <p class="font-display font-semibold text-sm leading-snug">Jembatan Sungai Bilah Diperlebar, Kapasitas Angkut Ditingkatkan</p>
-              </div>
-            </li>
-            <li class="news-card py-4 flex items-start gap-4">
-              <span class="trending-num">05</span>
-              <div>
-                <span class="cat-tag text-accent mb-1 block">Sosial</span>
-                <p class="font-display font-semibold text-sm leading-snug">Ribuan Warga Ikuti Vaksinasi Gratis di Puskesmas Se-Labuhanbatu Utara</p>
-              </div>
-            </li>
-          </ol>
-        </div>
-
-        <!-- Newsletter Box -->
-        <div class="bg-ink text-paper p-6">
-          <h3 class="font-display font-black text-lg mb-1">Langganan Newsletter</h3>
-          <p class="text-paper/60 text-xs leading-relaxed mb-4">Dapatkan ringkasan berita terpenting Labuhanbatu Raya langsung di kotak masuk Anda, setiap pagi.</p>
-          <input type="email" placeholder="email@anda.com" class="w-full bg-white/10 border border-white/20 text-paper placeholder-paper/40 px-3 py-2 text-sm mb-3 outline-none focus:border-accent font-body" />
-          <button class="w-full bg-accent hover:bg-accent-dark text-white py-2 cat-tag transition-colors">Daftar Sekarang</button>
-        </div>
-
-        <!-- Opini / Suara Warga -->
-        <div id="opini">
-          <div class="section-rule mb-5 flex items-baseline justify-between">
-            <h3 class="font-display font-black text-lg">Opini & Suara Warga</h3>
-            <a href="#" class="cat-tag text-ink-muted hover:text-accent read-more transition-colors">Semua</a>
-          </div>
-
-          <div class="space-y-0 divide-y divide-rule">
-
-            <article class="news-card py-5 first:pt-0">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center shrink-0">
-                  <span class="font-display font-bold text-accent text-sm">DR</span>
-                </div>
-                <div>
-                  <p class="font-body font-semibold text-sm">Dr. Reza Maulana, S.H., M.H.</p>
-                  <p class="text-xs text-ink-muted">Dosen Hukum, UINSU Medan</p>
-                </div>
-              </div>
-              <h4 class="font-display font-bold text-base leading-snug mb-2 italic">"Reformasi Birokrasi Daerah: Antara Harapan dan Realita Lapangan"</h4>
-              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Desentralisasi yang telah berjalan dua dekade lebih seharusnya melahirkan birokrasi yang lebih responsif. Namun kenyataannya, masih banyak layanan publik yang jauh dari kata memuaskan...</p>
-              <a href="#" class="text-xs text-accent hover:underline mt-2 block read-more">Baca selengkapnya</a>
-            </article>
-
-            <article class="news-card py-5">
-              <div class="flex items-center gap-3 mb-3">
-                <div class="w-10 h-10 rounded-full bg-ink/10 flex items-center justify-center shrink-0">
-                  <span class="font-display font-bold text-ink-muted text-sm">SH</span>
-                </div>
-                <div>
-                  <p class="font-body font-semibold text-sm">Sofyan Harahap</p>
-                  <p class="text-xs text-ink-muted">Petani Kelapa Sawit, Bilah Hilir</p>
-                </div>
-              </div>
-              <h4 class="font-display font-bold text-base leading-snug mb-2 italic">"Pupuk Subsidi Selalu Langka, Siapa yang Harus Bertanggung Jawab?"</h4>
-              <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">Sudah tiga musim tanam terakhir kami kesulitan mendapatkan pupuk bersubsidi. Distributor bilang stok habis, tapi di pasar gelap ada melimpah dengan harga tiga kali lipat...</p>
-              <a href="#" class="text-xs text-accent hover:underline mt-2 block read-more">Baca selengkapnya</a>
-            </article>
-
-          </div>
-        </div>
-
-        <!-- Tags Cloud -->
-        <div>
-          <div class="section-rule mb-4">
-            <h3 class="font-display font-black text-lg">Topik Populer</h3>
-          </div>
-          <div class="flex flex-wrap gap-2" id="tags-cloud">
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Labuhanbatu</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Rantauprapat</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Korupsi</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#SawitSumut</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#KUR</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Infrastruktur</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Pemkab</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#DPRD</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Pilkada2025</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Pertanian</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#Hukum</a>
-            <a href="#" class="px-3 py-1 border border-rule text-xs cat-tag hover:bg-ink hover:text-paper transition-all">#BinahRaya</a>
-          </div>
-        </div>
-
-      </aside>
-    </div>
-  </main>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- FOOTER                                      -->
-  <!-- ═══════════════════════════════════════════ -->
-  <footer class="bg-ink text-paper mt-16">
-    <div class="max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
-      <div class="grid grid-cols-1 sm:grid-cols-4 gap-8 mb-10">
-
-        <!-- Brand -->
-        <div class="sm:col-span-1">
-          <span class="font-display font-black text-3xl leading-none">Himlab<span class="text-accent">.</span></span>
-          <p class="text-paper/50 text-xs leading-relaxed mt-3">Media berita independen untuk warga Labuhanbatu Raya. Menyajikan informasi yang akurat, berimbang, dan berpihak pada kepentingan publik.</p>
-          <div class="flex gap-3 mt-4">
-            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">f</a>
-            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">tw</a>
-            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">ig</a>
-            <a href="#" class="w-8 h-8 border border-white/20 flex items-center justify-center hover:bg-accent hover:border-accent transition-all text-xs">yt</a>
-          </div>
-        </div>
-
-        <!-- Rubrik -->
-        <div>
-          <h5 class="cat-tag text-paper/40 mb-4">Rubrik</h5>
-          <ul class="space-y-2 text-sm text-paper/70">
-            <li><a href="#" class="hover:text-accent transition-colors">Nasional</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Hukum</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Ekonomi</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Labuhanbatu</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Opini</a></li>
-          </ul>
-        </div>
-
-        <!-- Tentang -->
-        <div>
-          <h5 class="cat-tag text-paper/40 mb-4">Perusahaan</h5>
-          <ul class="space-y-2 text-sm text-paper/70">
-            <li><a href="#" class="hover:text-accent transition-colors">Tentang Kami</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Redaksi</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Kode Etik</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Karir</a></li>
-            <li><a href="#" class="hover:text-accent transition-colors">Pasang Iklan</a></li>
-          </ul>
-        </div>
-
-        <!-- Kontak -->
-        <div>
-          <h5 class="cat-tag text-paper/40 mb-4">Kontak</h5>
-          <ul class="space-y-2 text-xs text-paper/60 leading-relaxed">
-            <li>📍 Jl. Diponegoro No. 14, Rantauprapat, Labuhanbatu 21411</li>
-            <li>📧 redaksi@himlabnews.id</li>
-            <li>📞 (0624) 21xxx</li>
-            <li class="pt-2"><a href="https://app.pagescms.org" target="_blank" class="cat-tag border border-white/20 px-3 py-1 hover:bg-accent hover:border-accent transition-all inline-block">⚙ Admin Panel</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-paper/30">
-        <span>© 2025 Himlab News. Seluruh hak cipta dilindungi undang-undang.</span>
-        <div class="flex gap-4">
-          <a href="#" class="hover:text-paper/60">Kebijakan Privasi</a>
-          <a href="#" class="hover:text-paper/60">Syarat & Ketentuan</a>
-          <a href="#" class="hover:text-paper/60">Sitemap</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ═══════════════════════════════════════════ -->
-  <!-- JAVASCRIPT: Utilities + GitHub API Hook     -->
-  <!-- ═══════════════════════════════════════════ -->
- /**
- * ═══════════════════════════════════════════════════════
- *  HIMLAB NEWS — Dynamic Content Engine
- *  Ganti seluruh blok <script> di index.html dengan ini.
- *  Kompatibel dengan Pages CMS + GitHub API + Cloudflare Pages
- * ═══════════════════════════════════════════════════════
+<script>
+/**
+ * ENGINE CMS ANTITESIS
+ * Terhubung dengan Github: ahmadzulkarnainyoo-dev / antitesis
  */
-
-// ──────────────────────────────────────────
-// 1. DATE UTILITIES
-// ──────────────────────────────────────────
-const HARI  = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const BULAN = ['Januari','Februari','Maret','April','Mei','Juni',
-               'Juli','Agustus','September','Oktober','November','Desember'];
+const HARI = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 
 function formatDate(isoDate) {
   if (!isoDate) return '';
-  try {
-    const d = new Date(isoDate);
-    return `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`;
-  } catch { return isoDate; }
+  try { const d = new Date(isoDate); return `${d.getDate()} ${BULAN[d.getMonth()]} ${d.getFullYear()}`; } 
+  catch { return isoDate; }
 }
 
 function relativeTime(isoDate) {
   if (!isoDate) return '';
   const diff = Date.now() - new Date(isoDate).getTime();
-  const h = Math.floor(diff / 3_600_000);
+  const h = Math.floor(diff / 3600000);
   if (h < 1)  return 'Baru saja';
   if (h < 24) return `${h} jam lalu`;
   const d = Math.floor(h / 24);
@@ -746,30 +275,18 @@ function relativeTime(isoDate) {
 
 const now = new Date();
 const dateEl = document.getElementById('current-date');
-if (dateEl) {
-  dateEl.textContent =
-    `${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}`;
-}
+if (dateEl) dateEl.textContent = `${HARI[now.getDay()]}, ${now.getDate()} ${BULAN[now.getMonth()]} ${now.getFullYear()}`;
 
-// ──────────────────────────────────────────
-// 2. GITHUB CONFIG
-//    ↓ Ganti ketiga nilai ini ↓
-// ──────────────────────────────────────────
 const GITHUB_CONFIG = {
-  owner:     'YOUR_GITHUB_USERNAME',   // ← username GitHub Anda
-  repo:      'YOUR_REPO_NAME',         // ← nama repository
-  branch:    'main',
-  postsPath: 'content/posts',
+  owner: 'ahmadzulkarnainyoo-dev',
+  repo: 'antitesis',
+  branch: 'main',
+  postsPath: 'content/posts'
 };
 
-// ──────────────────────────────────────────
-// 3. FRONTMATTER PARSER
-//    Mendukung format Pages CMS (.pages.yml)
-// ──────────────────────────────────────────
 function parseFrontmatter(text, sourceUrl) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!match) return null;
-
   const fm = {};
   match[1].split(/\r?\n/).forEach(line => {
     const colonIdx = line.indexOf(':');
@@ -778,277 +295,125 @@ function parseFrontmatter(text, sourceUrl) {
     const val = line.slice(colonIdx + 1).trim().replace(/^["']|["']$/g, '');
     if (key) fm[key] = val;
   });
-
   const slug = fm.slug || sourceUrl.split('/').pop().replace(/\.md$/, '');
-
   return {
-    title:    fm.title    || 'Tanpa Judul',
+    title: fm.title || 'Tanpa Judul',
     category: (fm.category || 'umum').toLowerCase().trim(),
-    date:     fm.date     || '',
-    excerpt:  fm.excerpt  || '',
-    image:    fm.image    || '',
-    author:   fm.author   || 'Redaksi Himlab',
+    date: fm.date || '',
+    excerpt: fm.excerpt || '',
+    image: fm.image || '',
+    author: fm.author || 'Redaksi',
     featured: fm.featured === 'true',
-    slug,
+    slug
   };
 }
 
-// ──────────────────────────────────────────
-// 4. FETCH SINGLE POST
-// ──────────────────────────────────────────
 async function fetchSinglePost(downloadUrl) {
   try {
     const res = await fetch(downloadUrl);
     if (!res.ok) return null;
-    const text = await res.text();
-    return parseFrontmatter(text, downloadUrl);
-  } catch {
-    return null;
-  }
+    return parseFrontmatter(await res.text(), downloadUrl);
+  } catch { return null; }
 }
 
-// ──────────────────────────────────────────
-// 5. FETCH ALL POSTS FROM GITHUB
-// ──────────────────────────────────────────
 async function fetchPostsFromGitHub() {
-  const { owner, repo, branch, postsPath } = GITHUB_CONFIG;
-
-  if (owner === 'YOUR_GITHUB_USERNAME') {
-    console.info('[Himlab] GitHub config belum diatur. Tetap pakai placeholder.');
-    return;
-  }
-
   try {
-    const apiUrl =
-      `https://api.github.com/repos/${owner}/${repo}/contents/${postsPath}?ref=${branch}`;
-    const res = await fetch(apiUrl, {
-      headers: { Accept: 'application/vnd.github.v3+json' },
-    });
-    if (!res.ok) throw new Error(`GitHub API: ${res.status}`);
-
-    const files  = await res.json();
+    const apiUrl = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.postsPath}?ref=${GITHUB_CONFIG.branch}`;
+    const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github.v3+json' } });
+    if (!res.ok) throw new Error('API Error');
+    const files = await res.json();
     const mdFiles = files.filter(f => f.name.endsWith('.md'));
-
-    // Ambil maks 20 post (tidak semua sekaligus agar tidak kena rate limit)
-    const posts = await Promise.all(
-      mdFiles.slice(0, 20).map(f => fetchSinglePost(f.download_url))
-    );
-
+    const posts = await Promise.all(mdFiles.slice(0, 20).map(f => fetchSinglePost(f.download_url)));
     renderPosts(posts.filter(Boolean));
-
-  } catch (err) {
-    console.error('[Himlab] Gagal load dari GitHub:', err);
-  }
+  } catch (err) { console.error('Gagal fetch data:', err); }
 }
 
-// ──────────────────────────────────────────
-// 6. CARD BUILDERS
-// ──────────────────────────────────────────
+function capitalise(str) { return str ? str.charAt(0).toUpperCase() + str.slice(1) : ''; }
 
-/** Card untuk grid Nasional (3-kolom) */
-function createGridCard(post) {
-  const el = document.createElement('article');
-  el.className = 'news-card';
-  el.innerHTML = `
-    <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-      ${post.image
-        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy" />`
-        : '<div class="w-full h-full bg-ink-soft"></div>'
-      }
-    </div>
-    <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
-    <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
-    <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">${post.excerpt}</p>
-    <span class="text-xs text-ink-muted mt-3 block">${relativeTime(post.date)}</span>
-  `;
-  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
-  return el;
-}
-
-/** Card untuk list Hukum (4-kolom grid + thumbnail) */
-function createHukumCard(post) {
-  const el = document.createElement('article');
-  el.className = 'news-card py-5 grid grid-cols-1 sm:grid-cols-4 gap-4';
-  el.innerHTML = `
-    <div class="sm:col-span-3">
-      <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
-      <h3 class="font-display font-bold text-lg leading-snug mb-2">${post.title}</h3>
-      <p class="text-sm text-ink-muted line-clamp-2 leading-relaxed">${post.excerpt}</p>
-      <div class="flex items-center gap-3 text-xs text-ink-muted mt-3">
-        <span>Oleh <strong>${post.author}</strong></span>
-        <span>·</span>
-        <span>${relativeTime(post.date)}</span>
-      </div>
-    </div>
-    <div class="aspect-video sm:aspect-square bg-ink-muted overflow-hidden">
-      ${post.image
-        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover" loading="lazy" />`
-        : '<div class="w-full h-full bg-ink-soft"></div>'
-      }
-    </div>
-  `;
-  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
-  return el;
-}
-
-/** Card untuk grid Ekonomi (thumbnail kanan, teks kiri) */
-function createEkonomiCard(post) {
-  const el = document.createElement('article');
-  el.className = 'news-card flex gap-4';
-  el.innerHTML = `
-    <div class="flex-1">
-      <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
-      <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
-      <p class="text-xs text-ink-muted line-clamp-3 leading-relaxed">${post.excerpt}</p>
-      <span class="text-xs text-ink-muted mt-2 block">${relativeTime(post.date)}</span>
-    </div>
-    <div class="w-24 h-24 bg-ink-muted shrink-0 overflow-hidden">
-      ${post.image
-        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover" loading="lazy" />`
-        : '<div class="w-full h-full bg-ink-soft"></div>'
-      }
-    </div>
-  `;
-  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
-  return el;
-}
-
-/** Card untuk section Labuhanbatu (dark background) */
-function createLabuhanbatuCard(post) {
-  const el = document.createElement('article');
-  el.className = 'news-card group';
-  el.innerHTML = `
-    <div class="aspect-video bg-ink-muted overflow-hidden mb-3">
-      ${post.image
-        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-75" loading="lazy" />`
-        : '<div class="w-full h-full bg-ink-soft opacity-50"></div>'
-      }
-    </div>
-    <span class="cat-tag text-accent/80 mb-2 block">${capitalise(post.category)}</span>
-    <h3 class="font-display font-bold text-base text-paper leading-snug mb-2">${post.title}</h3>
-    <span class="text-xs text-paper/50 mt-2 block">${relativeTime(post.date)}</span>
-  `;
-  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
-  return el;
-}
-
-/** Card untuk secondary hero stack (kanan hero) */
-function createSecondaryCard(post) {
-  const el = document.createElement('article');
-  el.className = 'news-card py-4 flex gap-4 items-start';
-  el.innerHTML = `
-    <div class="flex-1 min-w-0">
-      <span class="cat-tag text-accent mb-2 block">${capitalise(post.category)}</span>
-      <h3 class="font-display font-bold text-base leading-snug mb-2">${post.title}</h3>
-      <p class="text-xs text-ink-muted line-clamp-2 font-body leading-relaxed">${post.excerpt}</p>
-      <span class="text-xs text-ink-muted mt-2 block">${relativeTime(post.date)}</span>
-    </div>
-    <div class="w-20 h-16 sm:w-24 sm:h-20 bg-ink-muted shrink-0 overflow-hidden">
-      ${post.image
-        ? `<img src="${post.image}" alt="" class="w-full h-full object-cover" loading="lazy" />`
-        : '<div class="w-full h-full bg-ink-soft"></div>'
-      }
-    </div>
-  `;
-  el.addEventListener('click', () => (window.location.href = `/posts/${post.slug}`));
-  return el;
-}
-
-function capitalise(str) {
-  if (!str) return '';
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-// ──────────────────────────────────────────
-// 7. MASTER RENDER FUNCTION
-// ──────────────────────────────────────────
 function renderPosts(posts) {
   if (!posts.length) return;
+  posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Urutkan: post bertanda featured duluan, lalu by date DESC
-  posts.sort((a, b) => {
-    if (a.featured && !b.featured) return -1;
-    if (!a.featured && b.featured) return 1;
-    return new Date(b.date) - new Date(a.date);
+  let pool = [...posts];
+  const pullPost = (cond) => { const idx = pool.findIndex(cond); return idx > -1 ? pool.splice(idx, 1)[0] : null; };
+  const pullMany = (cond, count) => { let res = []; while(res.length < count) { const p = pullPost(cond); if(p) res.push(p); else break; } return res; };
+
+  // 1. HERO MAIN
+  const hero = pullPost(p => p.featured) || pullPost(() => true);
+  if(hero) {
+    document.getElementById('hero-main-container').innerHTML = `
+      <div>
+        <div class="hero-kicker">${capitalise(hero.category)}</div>
+        <h1 class="hero-headline" style="cursor:pointer;" onclick="window.location.href='baca.html?slug=${hero.slug}'">${hero.title}</h1>
+        <p class="hero-deck">${hero.excerpt}</p>
+        <div class="hero-byline"><strong>${hero.author}</strong> <span class="sep">·</span> <span>${relativeTime(hero.date)}</span></div>
+      </div>
+      <div style="margin-top:28px; cursor:pointer;" onclick="window.location.href='baca.html?slug=${hero.slug}'">
+        <div class="hero-image-area">
+          ${hero.image ? `<img src="${hero.image}" style="width:100%;height:100%;object-fit:cover;">` : `<div class="hero-image-placeholder"></div>`}
+        </div>
+      </div>
+    `;
+  }
+
+  // 2. BERITA TERKINI (Sidebar)
+  const terkini = pullMany(p => p.category !== 'opini', 5);
+  document.getElementById('hero-sidebar-list').innerHTML = terkini.map(p => `
+    <div class="side-story" onclick="window.location.href='baca.html?slug=${p.slug}'">
+      <div class="ss-cat">${capitalise(p.category)}</div>
+      <div class="ss-title">${p.title}</div>
+      <div class="ss-time">${relativeTime(p.date)}</div>
+    </div>
+  `).join('');
+
+  // 3. BERITA PILIHAN
+  const ft = pullPost(p => p.featured) || pullPost(p => p.category !== 'opini');
+  const reg = pullMany(p => p.category !== 'opini', 4);
+  let gridHtml = '';
+  if(ft) {
+    gridHtml += `
+      <div class="card card-featured fade-in" onclick="window.location.href='baca.html?slug=${ft.slug}'">
+        <div class="card-img img-block-2">${ft.image ? `<img src="${ft.image}" style="width:100%;height:100%;object-fit:cover;">` : `<div class="card-img-inner"></div>`}</div>
+        <div class="card-body">
+          <div class="card-cat">${capitalise(ft.category)}</div><div class="card-title">${ft.title}</div>
+          <div class="card-deck">${ft.excerpt}</div>
+          <div class="card-meta"><span class="author">${ft.author}</span><span class="dot-sep">·</span><span>${relativeTime(ft.date)}</span></div>
+        </div>
+      </div>`;
+  }
+  reg.forEach((p, i) => {
+    gridHtml += `
+      <div class="card fade-in" onclick="window.location.href='baca.html?slug=${p.slug}'">
+        <div class="card-img img-block-${3 + (i%6)}">${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover;">` : `<div class="card-img-inner"></div>`}</div>
+        <div class="card-cat">${capitalise(p.category)}</div><div class="card-title">${p.title}</div><div class="card-deck">${p.excerpt}</div>
+        <div class="card-meta"><span class="author">${p.author}</span><span class="dot-sep">·</span><span>${relativeTime(p.date)}</span></div>
+      </div>`;
   });
+  document.getElementById('berita-pilihan-grid').innerHTML = gridHtml;
 
-  // ── HERO UTAMA ──
-  const hero = posts[0];
-  document.getElementById('hero-title').textContent    = hero.title;
-  document.getElementById('hero-category').textContent = capitalise(hero.category);
-  document.getElementById('hero-excerpt').textContent  = hero.excerpt;
-  document.getElementById('hero-author').innerHTML =
-    `Oleh <strong class="text-white/80">${hero.author}</strong>`;
-  document.getElementById('hero-date').textContent = formatDate(hero.date);
-  if (hero.image) document.getElementById('hero-img').src = hero.image;
-  const heroMain = document.getElementById('hero-main');
-  heroMain.dataset.slug = hero.slug;
-  heroMain.style.cursor = 'pointer';
-  heroMain.addEventListener('click', () =>
-    (window.location.href = `/posts/${hero.slug}`)
-  );
+  // 4. OPINI
+  const opini = pullMany(p => p.category === 'opini', 4);
+  document.getElementById('opini-grid').innerHTML = opini.map((p, i) => `
+    <div class="opini-card" onclick="window.location.href='baca.html?slug=${p.slug}'">
+      <div class="opini-avatar av${(i%4)+1}">${p.author.substring(0,2).toUpperCase()}</div>
+      <div><div class="opini-author">${p.author}</div><div class="opini-role">Opini</div></div>
+      <div class="opini-title">"${p.title}"</div>
+    </div>
+  `).join('');
 
-  // ── SECONDARY HERO STACK (posts 1–3, kategori apapun) ──
-  const secondaryPosts = posts.slice(1, 4);
-  if (secondaryPosts.length) {
-    const sec = document.getElementById('hero-secondary');
-    sec.innerHTML = '';
-    secondaryPosts.forEach(p => sec.appendChild(createSecondaryCard(p)));
-  }
-
-  // ── CATEGORY SECTIONS ──
-  const byCategory = {};
-  posts.forEach(p => {
-    if (!byCategory[p.category]) byCategory[p.category] = [];
-    byCategory[p.category].push(p);
-  });
-
-  // Nasional — grid 3 kolom
-  const nasionalGrid = document.getElementById('nasional-grid');
-  if (nasionalGrid && byCategory.nasional) {
-    nasionalGrid.innerHTML = '';
-    byCategory.nasional.slice(0, 3).forEach(p =>
-      nasionalGrid.appendChild(createGridCard(p))
-    );
-  }
-
-  // Hukum — list layout
-  const hukumList = document.getElementById('hukum-list');
-  if (hukumList && byCategory.hukum) {
-    hukumList.innerHTML = '';
-    byCategory.hukum.slice(0, 3).forEach(p => {
-      const card = createHukumCard(p);
-      card.classList.add('article-divider');
-      hukumList.appendChild(card);
-    });
-  }
-
-  // Ekonomi — grid 2 kolom thumbnail kanan
-  const ekonomiGrid = document.getElementById('ekonomi-grid');
-  if (ekonomiGrid && byCategory.ekonomi) {
-    ekonomiGrid.innerHTML = '';
-    byCategory.ekonomi.slice(0, 4).forEach(p =>
-      ekonomiGrid.appendChild(createEkonomiCard(p))
-    );
-  }
-
-  // Labuhanbatu — dark section grid
-  const labGrid = document.getElementById('labuhanbatu-grid');
-  if (labGrid && byCategory.labuhanbatu) {
-    labGrid.innerHTML = '';
-    byCategory.labuhanbatu.slice(0, 3).forEach(p =>
-      labGrid.appendChild(createLabuhanbatuCard(p))
-    );
-  }
-
-  console.info(`[Himlab] ✓ ${posts.length} artikel dimuat.`);
+  // 5. TERPOPULER
+  const pop = [...posts].slice(0, 5);
+  document.getElementById('terpopuler-list').innerHTML = pop.map((p, i) => `
+    <div class="ranked-item" onclick="window.location.href='baca.html?slug=${p.slug}'">
+      <div class="rank-num">0${i+1}</div>
+      <div class="rank-body">
+        <div class="rank-cat">${capitalise(p.category)}</div><div class="rank-title">${p.title}</div><div class="rank-time">${relativeTime(p.date)}</div>
+      </div>
+    </div>
+  `).join('');
 }
 
-// ──────────────────────────────────────────
-// 8. INIT
-// ──────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', fetchPostsFromGitHub);
-  </script>
-
+</script>
 </body>
 </html>
